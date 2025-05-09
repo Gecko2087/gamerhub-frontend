@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background-color 0.5s, color 0.5s;
+}
+
+/* Tus estilos personalizados pueden ir aquí */
