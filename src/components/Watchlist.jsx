@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState, useEffect } from 'react';
 import { useProfile } from '../context/ProfileContext';
 import { useAuth } from '../context/AuthContext';
@@ -19,7 +20,7 @@ const Watchlist = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist`);
+      const response = await axios.get(`${API_URL}/profiles/${selectedProfile._id}/watchlist`);
       setGames(response.data);
       setError(null);
     } catch (err) {
@@ -32,7 +33,7 @@ const Watchlist = () => {
 
   const addToWatchlist = async (gameId) => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist`, { gameId: gameId });
+      await axios.post(`${API_URL}/profiles/${selectedProfile._id}/watchlist`, { gameId: gameId });
       toast.success('Juego agregado a la watchlist');
       fetchWatchlist();
     } catch (err) {
@@ -53,7 +54,7 @@ const Watchlist = () => {
     });
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist/${gameId}`);
+        await axios.delete(`${API_URL}/profiles/${selectedProfile._id}/watchlist/${gameId}`);
         toast.error('Juego eliminado de la watchlist', {
           className: 'bg-red-100 border-red-400 text-red-700',
           progressClassName: 'bg-red-500'

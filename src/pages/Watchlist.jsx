@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -19,7 +20,7 @@ export default function Watchlist() {
       setIsLoading(true);
       setError('');
       
-      const { data: watchlistGames } = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${profileId}/watchlist`);
+      const { data: watchlistGames } = await axios.get(`${API_URL}/profiles/${profileId}/watchlist`);
       
       // Eliminar console.log
       setGames(watchlistGames || []);
@@ -49,7 +50,7 @@ export default function Watchlist() {
         String(g._id) !== gameIdToUse
       ));
       
-      await axios.delete(`${import.meta.env.VITE_API_URL}/profiles/${profileId}/watchlist/${gameIdToUse}`);
+      await axios.delete(`${API_URL}/profiles/${profileId}/watchlist/${gameIdToUse}`);
       
       toast.error('Juego eliminado de la watchlist', {
         className: 'bg-red-100 border-red-400 text-red-700',

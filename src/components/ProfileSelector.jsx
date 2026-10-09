@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -12,7 +13,7 @@ const ProfileSelector = () => {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/profiles`);
+        const response = await axios.get(`${API_URL}/profiles`);
         setProfiles(response.data);
       } catch (err) {
         setError('Error al cargar los perfiles');

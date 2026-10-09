@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +13,7 @@ const AgeGate = ({ gameId, profileId, children }) => {
     const validateAge = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/games/validate-age/${gameId}/${profileId}`
+          `${API_URL}/games/validate-age/${gameId}/${profileId}`
         );
         setIsAllowed(response.data.isAllowed);
       } catch (err) {

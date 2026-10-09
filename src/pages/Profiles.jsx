@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -62,7 +63,7 @@ const ProfileForm = ({ onCancel, onProfileCreated, profile = null, existingProfi
 
       if (!result.isConfirmed) return;
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+      const apiUrl = API_URL || 'http://localhost:4000/api';
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
@@ -178,7 +179,7 @@ export default function Profiles() {
 
     const fetchProfiles = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+        const apiUrl = API_URL || 'http://localhost:4000/api';
         const token = localStorage.getItem('token');
         const response = await axios.get(`${apiUrl}/profiles`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -231,7 +232,7 @@ export default function Profiles() {
 
     if (result.isConfirmed) {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+        const apiUrl = API_URL || 'http://localhost:4000/api';
         const token = localStorage.getItem('token');
         await axios.delete(`${apiUrl}/profiles/${profile._id}`, {
           headers: { Authorization: `Bearer ${token}` }

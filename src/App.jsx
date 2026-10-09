@@ -26,6 +26,7 @@ const App = () => {
         <ProfileProvider>
         <Router>
           <Navbar />
+          {import.meta.env.VITE_DEMO_MODE === 'true' && <p className="bg-indigo-950 px-4 py-3 text-center text-sm text-indigo-100">Catálogo ficticio · perfiles y favoritos guardados en MongoDB · sesión de una hora.</p>}
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss pauseOnHover theme="colored" />
           <main className="min-h-screen flex-1 w-full flex flex-col p-0 m-0">
             <Routes>

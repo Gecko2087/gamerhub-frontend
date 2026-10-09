@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -24,11 +25,11 @@ const GameDetailsPage = () => {
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/${id}`);
+        const response = await axios.get(`${API_URL}/games/${id}`);
         setGame(response.data);
         // Solo consultar la watchlist si hay perfil seleccionado
         if (selectedProfile?._id) {
-          const watchlistResponse = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist`);
+          const watchlistResponse = await axios.get(`${API_URL}/profiles/${selectedProfile._id}/watchlist`);
           const gameInWatchlist = watchlistResponse.data.some(gameInList => 
             String(gameInList.id) === String(id) || String(gameInList.rawgId) === String(id) || String(gameInList._id) === String(id)
           );
@@ -56,13 +57,13 @@ const GameDetailsPage = () => {
     const gameIdForApi = id;
     try {
       if (isInWatchlist) {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist/${gameIdForApi}`);
+        await axios.delete(`${API_URL}/profiles/${selectedProfile._id}/watchlist/${gameIdForApi}`);
         toast.error('Juego eliminado de la watchlist', { position: 'bottom-right', autoClose: 2000, style: { background: '#dc2626', color: '#fff' } });
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist`, { gameId: gameIdForApi });
+        await axios.post(`${API_URL}/profiles/${selectedProfile._id}/watchlist`, { gameId: gameIdForApi });
         toast.success('Juego agregado a la watchlist', { position: 'bottom-right', autoClose: 2000 });
       }
-      const watchlistResponse = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${selectedProfile._id}/watchlist`);
+      const watchlistResponse = await axios.get(`${API_URL}/profiles/${selectedProfile._id}/watchlist`);
       const gameInWatchlist = watchlistResponse.data.some(gameInList => 
         String(gameInList.id) === String(id) || String(gameInList.rawgId) === String(id) || String(gameInList._id) === String(id)
       );

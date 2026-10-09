@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 
 const LoginPage = () => {
-  const { user } = useAuth();
+  const { user, demoLogin, loading, error } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +29,9 @@ const LoginPage = () => {
           </p>
         </div>
         <LoginForm />
+        <button type="button" disabled={loading} onClick={demoLogin} className="w-full mt-6 rounded-xl bg-indigo-600 px-4 py-4 font-bold text-white disabled:opacity-50">Probar con mi propio perfil</button>
+        <p className="mt-3 text-center text-sm text-gray-600 dark:text-gray-300">API real y MongoDB. Tu espacio vence en una hora; usá datos ficticios.</p>
+        {error && <p role="alert" className="mt-2 text-center text-red-500">{error}</p>}
       </div>
     </div>
   );
