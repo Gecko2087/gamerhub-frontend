@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -34,7 +35,7 @@ const ProfileForm = () => {
     if (id) {
       const fetchProfile = async () => {
         try {
-          const response = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${id}`);
+          const response = await axios.get(`${API_URL}/profiles/${id}`);
           const profile = response.data;
           setValue('name', profile.name);
           setIsKidProfile(profile.allowedRating === 'KIDS');
@@ -55,10 +56,10 @@ const ProfileForm = () => {
       };
 
       if (id) {
-        await axios.put(`${import.meta.env.VITE_API_URL}/profiles/${id}`, profileData);
+        await axios.put(`${API_URL}/profiles/${id}`, profileData);
         toast.success('Perfil actualizado correctamente');
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/profiles`, profileData);
+        await axios.post(`${API_URL}/profiles`, profileData);
         toast.success('Perfil creado correctamente');
       }
       navigate('/profiles');

@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
@@ -53,11 +54,11 @@ export default function Catalog() {
 
   const loadProfileAndWatchlist = useCallback(async () => {
     try {
-      const { data: profileData } = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${profileId}`); 
+      const { data: profileData } = await axios.get(`${API_URL}/profiles/${profileId}`);
       setProfile(profileData); 
       
       if (profileData) {
-        const { data: watchlistGames } = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/${profileId}/watchlist`);
+        const { data: watchlistGames } = await axios.get(`${API_URL}/profiles/${profileId}/watchlist`);
         setWatchlist(watchlistGames.map(g => g.id || g.rawgId || g._id) || []);
       }
     } catch (err) {
@@ -77,7 +78,7 @@ export default function Catalog() {
       
       // Cargar juegos de todas las páginas
       while (hasMorePages) {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/games/popular`, {
+        const { data } = await axios.get(`${API_URL}/games/popular`, {
           params: {
             page: currentFetchPage,
             pageSize: 50 // Cargar más juegos por página para reducir el número de llamadas
@@ -124,7 +125,7 @@ export default function Catalog() {
     try {
       setIsLoading(true);
       setError('');
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/games/popular`);
+      const { data } = await axios.get(`${API_URL}/games/popular`);
       const gamesArray = Array.isArray(data) ? data : (data.results || []);
       
       // Eliminar duplicados basados en rawgId o _id
@@ -166,10 +167,10 @@ export default function Catalog() {
       const isInWatchlist = !!gameInWatchlist;
 
       if (isInWatchlist) {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/profiles/${profileId}/watchlist/${gameId}`);
+        await axios.delete(`${API_URL}/profiles/${profileId}/watchlist/${gameId}`);
         toast.info('Juego removido de la watchlist');
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/profiles/${profileId}/watchlist`, { gameId: gameId });
+        await axios.post(`${API_URL}/profiles/${profileId}/watchlist`, { gameId: gameId });
         toast.success('Juego agregado a la watchlist');
       }
       await loadProfileAndWatchlist();

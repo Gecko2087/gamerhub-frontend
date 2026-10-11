@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -134,7 +135,7 @@ export default function AdminGamesPage() {
         genre,
         platform
       };
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/games`, { params });
+      const { data } = await axios.get(`${API_URL}/games`, { params });
       setGames(data.games || []);
       setTotal(data.total || 0);
     } catch {
@@ -164,7 +165,7 @@ export default function AdminGamesPage() {
   const handleDelete = async (id) => {
     if (!window.confirm('¿Eliminar juego?')) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/games/${id}`);
+      await axios.delete(`${API_URL}/games/${id}`);
       toast.success('Juego eliminado');
       fetchGames();
     } catch {
@@ -198,7 +199,7 @@ export default function AdminGamesPage() {
     });
     if (!cantidad) return;
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/games/import-popular`, { cantidad });
+      await axios.post(`${API_URL}/games/import-popular`, { cantidad });
       toast.success(`Juegos populares importados (${cantidad})`);
       fetchGames();
     } catch {
@@ -221,10 +222,10 @@ export default function AdminGamesPage() {
     delete safeData.clip;
     try {
       if (editGame) {
-        await axios.put(`${import.meta.env.VITE_API_URL}/games/${editGame._id}`, safeData);
+        await axios.put(`${API_URL}/games/${editGame._id}`, safeData);
         toast.success('Juego actualizado');
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/games`, safeData);
+        await axios.post(`${API_URL}/games`, safeData);
         toast.success('Juego creado');
       }
       setShowForm(false);

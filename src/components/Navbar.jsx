@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -110,7 +111,7 @@ export default function Navbar() {
                             onClick={async () => {
                               try {
                                 const token = localStorage.getItem('token');
-                                const res = await fetch(`${import.meta.env.VITE_API_URL}/profiles/export/watchlist-report`, {
+                                const res = await fetch(`${API_URL}/profiles/export/watchlist-report`, {
                                   headers: { Authorization: `Bearer ${token}` }
                                 });
                                 if (!res.ok) throw new Error('No autorizado o error al exportar');

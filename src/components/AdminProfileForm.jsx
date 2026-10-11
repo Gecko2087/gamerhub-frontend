@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -39,7 +40,7 @@ const AdminProfileForm = ({ userId, onCancel, onSuccess }) => {
         allowedRating: isKidProfile ? 'KIDS' : 'ADULTS'
       };
       
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/profiles`, profileData);
+      const response = await axios.post(`${API_URL}/profiles`, profileData);
       toast.success('Perfil creado correctamente');
       
       // Si hay una función onSuccess, llamarla con el perfil creado

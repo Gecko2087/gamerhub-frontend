@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -26,12 +27,12 @@ const AdminUsersPage = () => {
 
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/users`);
+        const response = await axios.get(`${API_URL}/users`);
         // Obtener los perfiles para cada usuario
         const usersWithProfiles = await Promise.all(
           response.data.map(async (user) => {
             try {
-              const profilesResponse = await axios.get(`${import.meta.env.VITE_API_URL}/profiles/user/${user._id}`);
+              const profilesResponse = await axios.get(`${API_URL}/profiles/user/${user._id}`);
               return { ...user, profiles: profilesResponse.data };
             } catch (err) {
               console.error(`Error al obtener perfiles para usuario ${user._id}:`, err);
@@ -57,7 +58,7 @@ const AdminUsersPage = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/users/${userId}/role`, { role: newRole });
+      await axios.put(`${API_URL}/users/${userId}/role`, { role: newRole });
       setUsers(users.map(user => 
         user._id === userId ? { ...user, role: newRole } : user
       ));
@@ -83,7 +84,7 @@ const AdminUsersPage = () => {
     });
     if (!result.isConfirmed) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/users/${userId}`);
+      await axios.delete(`${API_URL}/users/${userId}`);
       setUsers(users.filter(user => user._id !== userId));
       setError(null);
       toast.success('Usuario eliminado correctamente');
@@ -96,7 +97,7 @@ const AdminUsersPage = () => {
 
   const handleAddUser = async (newUser) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/users`, newUser);
+      const response = await axios.post(`${API_URL}/users`, newUser);
       setUsers([...users, { ...response.data, profiles: [] }]);
       setError(null);
       toast.success('Usuario agregado correctamente');
@@ -109,7 +110,7 @@ const AdminUsersPage = () => {
 
   const handleUpdateUser = async (userId, updatedData) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_URL}/users/${userId}`, updatedData);
+      const response = await axios.put(`${API_URL}/users/${userId}`, updatedData);
       setUsers(users.map(user => 
         user._id === userId ? { ...user, ...response.data } : user
       ));
@@ -124,7 +125,7 @@ const AdminUsersPage = () => {
 
   const handleCreateUser = async (userData) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/users`, userData);
+      const response = await axios.post(`${API_URL}/users`, userData);
       setUsers([...users, { ...response.data, profiles: [] }]);
       setShowCreateForm(false);
       toast.success('Usuario creado correctamente');
@@ -146,7 +147,7 @@ const AdminUsersPage = () => {
     });
     if (!result.isConfirmed) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/profiles/${profileId}`);
+      await axios.delete(`${API_URL}/profiles/${profileId}`);
       setUsers(users.map(user => 
         user._id === userId ? { ...user, profiles: user.profiles.filter(profile => profile._id !== profileId) } : user
       ));

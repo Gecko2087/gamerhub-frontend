@@ -18,6 +18,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Profiles from './pages/Profiles';
 import Watchlist from './components/Watchlist';
 import AdminGamesPage from './pages/AdminGamesPage';
+import { DEMO_MODE } from './config/api';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
         <ProfileProvider>
         <Router>
           <Navbar />
+          {DEMO_MODE && <p className="bg-indigo-950 px-4 py-3 text-center text-sm text-indigo-100" role="status">Modo demo · catálogo ficticio · sesión aislada de una hora cuando la API está disponible.</p>}
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss pauseOnHover theme="colored" />
           <main className="min-h-screen flex-1 w-full flex flex-col p-0 m-0">
             <Routes>

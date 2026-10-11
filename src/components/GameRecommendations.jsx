@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import GameCard from './GameCard';
@@ -10,7 +11,7 @@ const GameRecommendations = ({ profileId }) => {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/recommendations/${profileId}`);
+        const response = await axios.get(`${API_URL}/games/recommendations/${profileId}`);
         setRecommendations(response.data);
       } catch (err) {
         setError('Error al cargar las recomendaciones');

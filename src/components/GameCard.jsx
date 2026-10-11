@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { StarIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatchlist, watchlistLoading }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   // Uso el ID que esté disponible para asegurar compatibilidad con la API
   const gameId = game._id || game.rawgId || game.id || null;
@@ -62,7 +59,10 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    if (!dateString) return 'Sin fecha';
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'Sin fecha';
+    return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -92,11 +92,12 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
         : game.description || 'Sin descripción.');
 
   return (
-    <div
-      className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden flex flex-col cursor-pointer hover:scale-[1.02] transition-transform border border-slate-300 dark:border-slate-700 group"
-      onClick={() => navigate(`/games/${game._id}`)}
-    >
-      <div className={`block ${isRestricted ? 'pointer-events-none opacity-70 grayscale' : ''}`}>
+    <article className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden flex flex-col hover:scale-[1.02] transition-transform border border-slate-300 dark:border-slate-700 group">
+      {gameId && !isRestricted ? <Link
+        to={`/games/${gameId}`}
+        className="block focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-400"
+        aria-label={`Ver detalles de ${game.name}`}
+      >
         <div className="relative pb-[56.25%] overflow-hidden group">
           <img
             src={game.background_image || game.backgroundImage || '/placeholder-game.jpg'}
@@ -116,10 +117,19 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
             </div>
           )}
         </div>
-      </div>
+      </Link> : <div className={isRestricted ? 'opacity-70 grayscale' : ''}>
+        <div className="relative pb-[56.25%] overflow-hidden group">
+          <img
+            src={game.background_image || game.backgroundImage || '/placeholder-game.jpg'}
+            alt={game.name}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {isRestricted && <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"><div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium transform -rotate-12">No disponible</div></div>}
+        </div>
+      </div>}
       <div className="p-4 flex-grow flex flex-col">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1 transition-colors duration-500">
-          {game.name}
+          {isRestricted || !gameId ? game.name : <Link className="hover:text-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400" to={`/games/${gameId}`}>{game.name}</Link>}
         </h3>
         <p className="text-slate-700 dark:text-slate-300 mb-3 text-sm line-clamp-2 flex-grow transition-colors duration-500">
           {resumen}
@@ -140,7 +150,7 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
               <svg className="h-4 w-4 text-slate-400 dark:text-slate-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span>{formatDate(game.releaseDate) || 'Sin fecha'}</span>
+              <span>{formatDate(game.releaseDate || game.released)}</span>
             </div>
             {!isRestricted && (
               <div className="flex items-center">
@@ -174,6 +184,8 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
             <button
               onClick={handleToggleWatchlist}
               disabled={isLoading || watchlistLoading}
+              aria-pressed={isInWatchlist}
+              aria-label={`${isInWatchlist ? 'Quitar' : 'Agregar'} ${game.name} ${isInWatchlist ? 'de' : 'a'} favoritos`}
               className="px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 bg-teal-100 dark:bg-teal-600/20 text-teal-700 dark:text-teal-400 hover:bg-teal-200 dark:hover:bg-teal-600/30"
             >
               {(isLoading || watchlistLoading) ? (
@@ -195,7 +207,7 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                       </svg>
-                      Watchlist
+                      Favoritos
                     </>
                   )}
                 </span>
@@ -205,12 +217,12 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
         </div>
 
         {error && (
-          <div className="mt-2 text-xs text-red-400 text-center">
+          <div role="alert" className="mt-2 text-xs text-red-400 text-center">
             {error}
           </div>
         )}
       </div>
-    </div>
+    </article>
   );
 };
 

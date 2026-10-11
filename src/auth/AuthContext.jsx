@@ -1,3 +1,4 @@
+import { API_URL } from '../config/api.js';
 import { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
@@ -7,7 +8,7 @@ export const useAuth = () => useContext(Auth);
 export default function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+  axios.defaults.baseURL = API_URL;
   if (token) axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
   const login = async (email, password) => {

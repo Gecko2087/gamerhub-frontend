@@ -1,8 +1,9 @@
+import { API_URL } from '../config/api.js';
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Configuración global de Axios
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+axios.defaults.baseURL = API_URL;
 
 const AuthContext = createContext();
 
@@ -79,6 +80,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const demoLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post('/auth/demo');
+      localStorage.removeItem('selectedProfile');
+      localStorage.setItem('token', response.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      setUser(response.data.user);
+      return true;
+    } catch (err) {
+      const message = err.response?.data?.error || err.response?.data?.message ||
+        (err.request
+          ? 'La demo no está disponible porque no se pudo conectar con la API. Intenta nuevamente más tarde.'
+          : 'No se pudo iniciar la demo.');
+      setError(message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('selectedProfile');
@@ -111,6 +134,7 @@ export const AuthProvider = ({ children }) => {
       loading,
       error,
       login,
+      demoLogin,
       register,
       logout,
       updateUser,
