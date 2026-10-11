@@ -34,7 +34,6 @@ No se deben guardar tokens, contraseñas ni credenciales del backend en el repos
 ## Validación
 
 ```bash
-npm run lint
 npm run build
 ```
 
