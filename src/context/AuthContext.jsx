@@ -82,15 +82,24 @@ export const AuthProvider = ({ children }) => {
 
   const demoLogin = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.post('/auth/demo');
       localStorage.removeItem('selectedProfile');
       localStorage.setItem('token', response.data.token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       setUser(response.data.user);
-      setError(null);
-    } catch (err) { setError(err.response?.data?.error || 'No se pudo abrir la demo'); }
-    finally { setLoading(false); }
+      return true;
+    } catch (err) {
+      const message = err.response?.data?.error || err.response?.data?.message ||
+        (err.request
+          ? 'La demo no está disponible porque no se pudo conectar con la API. Intenta nuevamente más tarde.'
+          : 'No se pudo iniciar la demo.');
+      setError(message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {

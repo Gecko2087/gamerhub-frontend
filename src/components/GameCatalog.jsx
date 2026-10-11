@@ -25,6 +25,7 @@ const GameCatalog = () => {
   const [platform, setPlatform] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [loadingAllGames, setLoadingAllGames] = useState(false);
+  const [watchlistStatus, setWatchlistStatus] = useState('');
 
   // Limpia al cambiar de perfil
   useEffect(() => {
@@ -45,9 +46,10 @@ const GameCatalog = () => {
       try {
         const currentProfileId = selectedProfile?._id || profileId;
         const { data: watchlistData } = await axios.get(`${API_URL}/profiles/${currentProfileId}/watchlist`);
-        setWatchlist(watchlistData.map(g => g._id) || []);
+        setWatchlist(watchlistData.map(g => g._id || g.rawgId || g.id).filter(Boolean));
       } catch (err) {
         setWatchlist([]);
+        setWatchlistStatus('No se pudieron cargar los favoritos. El catálogo sigue disponible.');
       }
     };
     fetchWatchlist();
@@ -124,6 +126,7 @@ const GameCatalog = () => {
   const fetchGames = async (page = 1, searchValue = search, genreValue = genre, platformValue = platform) => {
     try {
       setLoading(true);
+      setError(null);
       const response = await axios.get(`${API_URL}/games/public`, {
         params: {
           page,
@@ -142,7 +145,9 @@ const GameCatalog = () => {
         loadAllGamesForKidsProfile();
       }
     } catch (err) {
-      setError('Error al cargar los juegos');
+      setError(err.response
+        ? 'La API no pudo cargar el catálogo. Intenta nuevamente.'
+        : 'No se pudo conectar con la API de GamerHub. El catálogo necesita el backend disponible.');
     } finally {
       setLoading(false);
     }
@@ -236,6 +241,7 @@ const GameCatalog = () => {
       const isInWatchlist = watchlist.some(id => String(id) === String(gameId));
       if (isInWatchlist) {
         await axios.delete(`${API_URL}/profiles/${currentProfileId}/watchlist/${gameId}`);
+        setWatchlistStatus('Juego quitado de favoritos.');
         toast.info('Juego eliminado de la watchlist', {
           position: "bottom-right",
           autoClose: 2000,
@@ -243,6 +249,7 @@ const GameCatalog = () => {
         });
       } else {
         await axios.post(`${API_URL}/profiles/${currentProfileId}/watchlist`, { gameId });
+        setWatchlistStatus('Juego agregado a favoritos.');
         toast.success('Juego agregado a la watchlist', {
           position: "bottom-right",
           autoClose: 2000
@@ -250,7 +257,7 @@ const GameCatalog = () => {
       }
       // Actualizar watchlist tras la operación
       const { data: updatedWatchlistData } = await axios.get(`${API_URL}/profiles/${currentProfileId}/watchlist`);
-      setWatchlist(updatedWatchlistData.map(g => g._id));
+      setWatchlist(updatedWatchlistData.map(g => g._id || g.rawgId || g.id).filter(Boolean));
       setLoadingWatchlist(prev => ({ ...prev, [gameId]: false }));
       return true;
     } catch (err) {
@@ -262,10 +269,11 @@ const GameCatalog = () => {
         position: "bottom-right",
         autoClose: 3000
       });
+      setWatchlistStatus(`No se pudo actualizar favoritos: ${errorMsg}`);
       
       try {
         const { data: updatedWatchlistDataOnError } = await axios.get(`${API_URL}/profiles/${currentProfileId}/watchlist`);
-        setWatchlist(updatedWatchlistDataOnError.map(g => g._id));
+        setWatchlist(updatedWatchlistDataOnError.map(g => g._id || g.rawgId || g.id).filter(Boolean));
       } catch (e) {
         setWatchlist([]);
       }
@@ -276,16 +284,20 @@ const GameCatalog = () => {
 
   if (loading && !loadingAllGames) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      <div className="flex flex-col justify-center items-center h-64" role="status" aria-live="polite">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500" aria-hidden="true"></div>
+        <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando catálogo…</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-red-500 text-center p-4 bg-red-100 rounded-lg">
-        {error}
+      <div role="alert" className="mx-auto my-12 max-w-xl text-center p-6 text-red-800 bg-red-100 rounded-lg">
+        <p>{error}</p>
+        <button type="button" onClick={() => fetchGames(1, search, genre, platform)} className="mt-4 rounded-md bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+          Reintentar
+        </button>
       </div>
     );
   }
@@ -293,30 +305,45 @@ const GameCatalog = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Filtros y búsqueda */}
-      <div className="flex flex-wrap gap-4 mb-6 items-center">
-        <input
-          type="text"
-          value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
-          placeholder="Buscar por nombre..."
-          className="p-2 rounded border dark:bg-slate-900 dark:text-white"
-        />
-        <select
-          value={genre}
-          onChange={e => { setGenre(e.target.value); setCurrentPage(1); }}
-          className="p-2 rounded border dark:bg-slate-900 dark:text-white"
-        >
-          <option value="">Todos los géneros</option>
-          {genresList.map(g => <option key={g} value={g}>{g}</option>)}
-        </select>
-        <select
-          value={platform}
-          onChange={e => { setPlatform(e.target.value); setCurrentPage(1); }}
-          className="p-2 rounded border dark:bg-slate-900 dark:text-white"
-        >
-          <option value="">Todas las plataformas</option>
-          {platformsList.map(p => <option key={p} value={p}>{p}</option>)}
-        </select>
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Catálogo de juegos</h1>
+        <p className="mt-2 text-slate-600 dark:text-slate-300">Busca un título y guárdalo en los favoritos del perfil seleccionado.</p>
+      </header>
+      <div className="flex flex-wrap gap-4 mb-3 items-end" role="search" aria-label="Buscar y filtrar juegos">
+        <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          Buscar por nombre
+          <input
+            type="search"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            placeholder="Ejemplo: Zelda"
+            autoComplete="off"
+            aria-describedby="catalog-status"
+            className="p-2 rounded border dark:bg-slate-900 dark:text-white"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          Género
+          <select
+            value={genre}
+            onChange={e => { setGenre(e.target.value); setCurrentPage(1); }}
+            className="p-2 rounded border dark:bg-slate-900 dark:text-white"
+          >
+            <option value="">Todos los géneros</option>
+            {genresList.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+          Plataforma
+          <select
+            value={platform}
+            onChange={e => { setPlatform(e.target.value); setCurrentPage(1); }}
+            className="p-2 rounded border dark:bg-slate-900 dark:text-white"
+          >
+            <option value="">Todas las plataformas</option>
+            {platformsList.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </label>
         
         {selectedProfile?.allowedRating === 'KIDS' && (
           <div className="px-3 py-1 bg-green-600 text-white rounded-full text-sm ml-auto">
@@ -324,6 +351,10 @@ const GameCatalog = () => {
           </div>
         )}
       </div>
+      <p id="catalog-status" className="mb-6 text-sm text-slate-600 dark:text-slate-300" role="status" aria-live="polite">
+        {searchInput !== search ? 'Actualizando búsqueda…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
+      </p>
+      {watchlistStatus && <p className="sr-only" role="status" aria-live="polite">{watchlistStatus}</p>}
       
       {loadingAllGames && (
         <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded mb-4 flex items-center">
@@ -351,11 +382,17 @@ const GameCatalog = () => {
       
       {filteredGames.length === 0 && !loading && !loadingAllGames && (
         <div className="text-center py-10">
-          <p className="text-gray-600 dark:text-gray-400 mb-2">No hay juegos que coincidan con el filtro actual.</p>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">No encontramos juegos</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-2">Prueba otro nombre o limpia los filtros actuales.</p>
           {selectedProfile?.allowedRating === 'KIDS' && (
             <p className="text-gray-500 dark:text-gray-500">
               Recuerda que para perfiles infantiles solo se muestran juegos con clasificación por edad apropiada.
             </p>
+          )}
+          {(searchInput || genre || platform) && (
+            <button type="button" onClick={() => { setSearchInput(''); setSearch(''); setGenre(''); setPlatform(''); setCurrentPage(1); }} className="mt-4 rounded-md bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-300">
+              Limpiar filtros
+            </button>
           )}
         </div>
       )}

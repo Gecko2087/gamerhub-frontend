@@ -9,6 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { profileSchema } from '../utils/validations';
 import { useProfile } from '../context/ProfileContext';
 import Swal from 'sweetalert2';
+import { DEMO_MODE } from '../config/api';
 
 const CLASIFICACIONES = {
   KIDS: { label: 'Niños', color: 'bg-green-600' },
@@ -169,6 +170,8 @@ export default function Profiles() {
   const [showForm, setShowForm] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [editingProfile, setEditingProfile] = useState(null);
+  const [loadError, setLoadError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
   const { selectProfile } = useProfile();
 
   useEffect(() => {
@@ -179,6 +182,8 @@ export default function Profiles() {
 
     const fetchProfiles = async () => {
       try {
+        setLoading(true);
+        setLoadError('');
         const apiUrl = API_URL || 'http://localhost:4000/api';
         const token = localStorage.getItem('token');
         const response = await axios.get(`${apiUrl}/profiles`, {
@@ -188,12 +193,15 @@ export default function Profiles() {
         setLoading(false);
       } catch (error) {
         console.error('Error al cargar perfiles:', error);
+        setLoadError(error.response
+          ? 'La API no pudo cargar los perfiles de esta sesión.'
+          : 'No se pudo conectar con la API de GamerHub. La sesión demo requiere el backend disponible.');
         setLoading(false);
       }
     };
 
     fetchProfiles();
-  }, [user, navigate]);
+  }, [user, navigate, reloadKey]);
 
   const handleProfileCreated = (newProfile) => {
     if (editingProfile) {
@@ -260,6 +268,16 @@ export default function Profiles() {
   return (
     <main className="min-h-screen bg-slate-900">
       <div className="container mx-auto px-4 py-8">
+        {DEMO_MODE && (
+          <section className="mb-8 rounded-xl border border-indigo-400/40 bg-indigo-950/50 p-5 text-indigo-50" aria-labelledby="demo-onboarding-title">
+            <h2 id="demo-onboarding-title" className="text-xl font-bold">Tu recorrido demo</h2>
+            <ol className="mt-3 grid gap-3 text-sm md:grid-cols-3">
+              <li><strong>1.</strong> Selecciona o crea un perfil ficticio.</li>
+              <li><strong>2.</strong> Explora el catálogo y abre un juego.</li>
+              <li><strong>3.</strong> Agrega títulos a favoritos y revisa la lista.</li>
+            </ol>
+          </section>
+        )}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-white">Selecciona un perfil</h1>
           <button
@@ -272,6 +290,22 @@ export default function Profiles() {
             Añadir perfil
           </button>
         </div>
+
+        {loadError && (
+          <div role="alert" className="mb-8 rounded-lg border border-red-500 bg-red-950/30 p-5 text-red-200">
+            <p>{loadError}</p>
+            <button type="button" onClick={() => setReloadKey(key => key + 1)} className="mt-3 rounded-md bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+              Reintentar
+            </button>
+          </div>
+        )}
+
+        {!loadError && profiles.length === 0 && (
+          <div className="mb-8 rounded-lg border border-dashed border-slate-600 bg-slate-800 p-6 text-center">
+            <h2 className="text-xl font-semibold text-white">Crea el primer perfil</h2>
+            <p className="mt-2 text-slate-300">El perfil separa los favoritos y permite probar el filtro de contenido infantil.</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {profiles.map((profile) => (
