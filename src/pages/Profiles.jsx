@@ -311,23 +311,31 @@ export default function Profiles() {
           {profiles.map((profile) => (
             <div
               key={profile._id}
-              className="group relative cursor-pointer text-center transform transition-transform hover:scale-105 flex flex-col items-center"
-              onClick={() => handleProfileSelect(profile)}
+              className="group relative text-center transform transition-transform hover:scale-105 flex flex-col items-center"
             >
-              <div className={`w-32 h-32 rounded-full ${profile.allowedRating === 'KIDS' ? 'bg-green-600' : 'bg-red-600'} mx-auto flex items-center justify-center text-4xl font-bold text-white group-hover:ring-4 ring-offset-2 ring-offset-slate-900 ring-teal-400 transition-all duration-200`}>
-                {profile.name[0].toUpperCase()}
-              </div>
-              <p className="mt-3 text-white font-medium truncate w-full px-1">{profile.name}</p>
-              <div className="flex justify-center items-center gap-2 mt-1 text-xs">
-                <span className={`px-2 py-0.5 rounded-full text-white ${profile.allowedRating === 'KIDS' ? 'bg-green-600' : 'bg-red-600'} font-semibold`}>
-                  {profile.allowedRating === 'KIDS' ? 'Niños' : 'Adulto'}
+              <button
+                type="button"
+                onClick={() => handleProfileSelect(profile)}
+                aria-label={`Seleccionar perfil ${profile.name}`}
+                className="flex w-full flex-col items-center rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-4 focus:ring-offset-slate-900"
+              >
+                <div className={`w-32 h-32 rounded-full ${profile.allowedRating === 'KIDS' ? 'bg-green-600' : 'bg-red-600'} mx-auto flex items-center justify-center text-4xl font-bold text-white group-hover:ring-4 ring-offset-2 ring-offset-slate-900 ring-teal-400 transition-all duration-200`}>
+                  {profile.name[0].toUpperCase()}
+                </div>
+                <span className="mt-3 text-white font-medium truncate w-full px-1">{profile.name}</span>
+                <span className="flex justify-center items-center gap-2 mt-1 text-xs">
+                  <span className={`px-2 py-0.5 rounded-full text-white ${profile.allowedRating === 'KIDS' ? 'bg-green-600' : 'bg-red-600'} font-semibold`}>
+                    {profile.allowedRating === 'KIDS' ? 'Niños' : 'Adulto'}
+                  </span>
                 </span>
-              </div>
+              </button>
               
               {/* Botones de editar y eliminar */}
-              <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                 <button
+                  type="button"
                   onClick={(e) => handleEditProfile(profile, e)}
+                  aria-label={`Editar perfil ${profile.name}`}
                   className="p-2 bg-slate-700 rounded-full hover:bg-slate-600 transition-colors"
                   title="Editar perfil"
                 >
@@ -336,7 +344,9 @@ export default function Profiles() {
                   </svg>
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => handleDeleteProfile(profile, e)}
+                  aria-label={`Eliminar perfil ${profile.name}`}
                   className="p-2 bg-red-600 rounded-full hover:bg-red-500 transition-colors"
                   title="Eliminar perfil"
                 >
