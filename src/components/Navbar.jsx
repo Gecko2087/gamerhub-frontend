@@ -54,13 +54,15 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-4">
-              <Link to="/" className="flex-shrink-0 flex items-center">
+              <Link to="/" aria-label="GamerHub — inicio" className="flex-shrink-0 flex items-center">
                 <span
                   className="font-extrabold text-4xl tracking-widest glitch-navbar neon-glow-navbar"
-                  data-text="GamerHub"
+                  aria-hidden="true"
                   style={{ color: neon }}
                 >
                   GamerHub
+                  <span className="glitch-navbar-copy glitch-navbar-copy-before">GamerHub</span>
+                  <span className="glitch-navbar-copy glitch-navbar-copy-after">GamerHub</span>
                 </span>
               </Link>
             </div>
@@ -185,8 +187,7 @@ export default function Navbar() {
         .glitch-navbar {
           position: relative;
         }
-        .glitch-navbar:before, .glitch-navbar:after {
-          content: attr(data-text);
+        .glitch-navbar-copy {
           position: absolute;
           left: 0; width: 100%;
           overflow: hidden;
@@ -194,12 +195,12 @@ export default function Navbar() {
           opacity: 0.7;
           z-index: 1;
         }
-        .glitch-navbar:before {
+        .glitch-navbar-copy-before {
           text-shadow: 2px 0 #00fff7;
           animation: glitch-anim-navbar 2s infinite linear alternate-reverse;
           top: 1px;
         }
-        .glitch-navbar:after {
+        .glitch-navbar-copy-after {
           text-shadow: -2px 0 #ff00ea;
           animation: glitch-anim2-navbar 2.2s infinite linear alternate-reverse;
           top: -1px;
