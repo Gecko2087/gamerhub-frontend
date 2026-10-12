@@ -34,12 +34,12 @@ const LoginPage = () => {
             Tu plataforma para descubrir y gestionar tus juegos favoritos
           </p>
         </div>
-        <LoginForm />
+        {!DEMO_MODE && <LoginForm />}
         {DEMO_MODE && (
           <section className="mt-6 rounded-xl border border-indigo-400/40 bg-indigo-950/40 p-4" aria-labelledby="demo-title">
             <h2 id="demo-title" className="text-lg font-bold text-white">Recorrido para visitantes</h2>
             <p id="demo-description" className="mt-2 text-sm text-indigo-100">
-              Crea una sesión temporal y aislada en la API de GamerHub. Los perfiles y favoritos se guardan en MongoDB durante una hora. Usa únicamente datos ficticios.
+              Abre un espacio temporal y aislado por una hora para probar perfiles, catálogo y favoritos. Usa únicamente datos ficticios.
             </p>
             <button
               type="button"
@@ -48,7 +48,7 @@ const LoginPage = () => {
               aria-describedby="demo-description"
               className="mt-4 w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:cursor-wait disabled:opacity-60"
             >
-              {loading ? 'Preparando sesión demo…' : 'Abrir demo temporal'}
+              {loading ? 'Preparando sesión demo…' : 'Probar como visitante'}
             </button>
           </section>
         )}

@@ -27,13 +27,13 @@ const App = () => {
         <ProfileProvider>
         <Router>
           <Navbar />
-          {DEMO_MODE && <p className="bg-indigo-950 px-4 py-3 text-center text-sm text-indigo-100" role="status">Modo demo · catálogo ficticio · sesión aislada de una hora cuando la API está disponible.</p>}
+          {DEMO_MODE && <p className="bg-indigo-950 px-4 py-3 text-center text-sm text-indigo-100" role="status">Demo pública · sesión aislada por una hora · usa datos ficticios.</p>}
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss pauseOnHover theme="colored" />
           <main className="min-h-screen flex-1 w-full flex flex-col p-0 m-0">
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register" element={DEMO_MODE ? <Navigate to="/login" replace /> : <RegisterPage />} />
               <Route
                 path="/catalog"
                 element={

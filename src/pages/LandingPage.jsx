@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DEMO_MODE } from '../config/api';
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -60,15 +61,29 @@ export default function LandingPage() {
             color: textColor
           }}>
           {/* Logo glitch */}
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-center glitch neon-glow" data-text="GamerHub" style={{ color: neon }}>
-            GamerHub
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-center neon-glow" style={{ color: neon }}>
+            <span className="sr-only">GamerHub</span>
+            <span className="glitch" aria-hidden="true">
+              GamerHub
+              <span className="glitch-copy glitch-copy-before">GamerHub</span>
+              <span className="glitch-copy glitch-copy-after">GamerHub</span>
+            </span>
           </h1>
           <p className="text-lg md:text-xl mb-8 z-10 text-center transition-colors duration-500" style={{ color: textColor }}>
             Tu plataforma social de videojuegos
           </p>
           <div className="flex gap-4 mb-8 z-10">
-        {!user ? (
-          <>
+            {!user ? (
+              DEMO_MODE ? (
+                <Link
+                  to="/login"
+                  className="px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#39ff14] focus:ring-offset-2 neon-btn bg-[#39ff14] text-[#0a0f0d] hover:bg-[#39ff14] hover:text-black dark:bg-[#39ff14] dark:text-[#0a0f0d]"
+                  style={{ boxShadow: `0 0 16px ${neon}` }}
+                >
+                  Probar como visitante
+                </Link>
+              ) : (
+                <>
                 <Link
                   to="/login"
                   className="px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#39ff14] focus:ring-offset-2 neon-btn bg-[#39ff14] text-[#0a0f0d] hover:bg-[#39ff14] hover:text-black dark:bg-[#39ff14] dark:text-[#0a0f0d]"
@@ -82,14 +97,15 @@ export default function LandingPage() {
                 >
                   Registrarse
                 </Link>
-          </>
-        ) : (
+                </>
+              )
+            ) : (
               <Link to="/profiles" className="px-6 py-3 rounded-lg font-semibold transition-colors z-10 neon-btn bg-[#39ff14] text-[#0a0f0d] hover:bg-[#39ff14] hover:text-black dark:bg-[#39ff14] dark:text-[#0a0f0d]"
                 style={{ boxShadow: `0 0 16px ${neon}` }}>
                 Ir a Perfiles
               </Link>
-        )}
-      </div>
+            )}
+          </div>
           <div className="mt-8 text-center z-10 transition-colors duration-500" style={{ color: textColor }}>
             <p className="text-base md:text-lg">
               Explora, filtra y guarda tus juegos favoritos.<br />
@@ -106,8 +122,7 @@ export default function LandingPage() {
         .glitch {
           position: relative;
         }
-        .glitch:before, .glitch:after {
-          content: attr(data-text);
+        .glitch-copy {
           position: absolute;
           left: 0; width: 100%;
           overflow: hidden;
@@ -115,12 +130,12 @@ export default function LandingPage() {
           opacity: 0.7;
           z-index: 1;
         }
-        .glitch:before {
+        .glitch-copy-before {
           text-shadow: 2px 0 #00fff7;
           animation: glitch-anim 2s infinite linear alternate-reverse;
           top: 2px;
         }
-        .glitch:after {
+        .glitch-copy-after {
           text-shadow: -2px 0 #ff00ea;
           animation: glitch-anim2 2.2s infinite linear alternate-reverse;
           top: -2px;
