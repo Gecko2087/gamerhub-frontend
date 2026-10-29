@@ -1,3 +1,4 @@
+import { gameCover, coverFallback } from '../utils/gameCover';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -92,7 +93,7 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
         : game.description || 'Sin descripción.');
 
   return (
-    <article className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden flex flex-col hover:scale-[1.02] transition-transform border border-slate-300 dark:border-slate-700 group">
+    <article className="game-card bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden flex flex-col hover:scale-[1.02] transition-transform border border-slate-300 dark:border-slate-700 group">
       {gameId && !isRestricted ? <Link
         to={`/games/${gameId}`}
         className="block focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-400"
@@ -100,7 +101,10 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
       >
         <div className="relative pb-[56.25%] overflow-hidden group">
           <img
-            src={game.background_image || game.backgroundImage || '/placeholder-game.jpg'}
+            src={gameCover(game)}
+            onError={coverFallback}
+            loading="lazy"
+            decoding="async"
             alt={game.name}
             className="absolute inset-0 w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
           />
@@ -112,15 +116,18 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
             </div>
           )}
           {!isRestricted && game.rating > 0 && (
-            <div className="absolute top-2 right-2 bg-yellow-500 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold shadow-lg">
-              {game.rating.toFixed(1)}
+            <div className="absolute top-2 right-2 bg-yellow-300 text-slate-950 rounded-full h-10 w-10 flex items-center justify-center font-bold shadow-lg">
+              {Number(game.rating).toFixed(1)}
             </div>
           )}
         </div>
       </Link> : <div className={isRestricted ? 'opacity-70 grayscale' : ''}>
         <div className="relative pb-[56.25%] overflow-hidden group">
           <img
-            src={game.background_image || game.backgroundImage || '/placeholder-game.jpg'}
+            src={gameCover(game)}
+            onError={coverFallback}
+            loading="lazy"
+            decoding="async"
             alt={game.name}
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -145,7 +152,7 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
               </span>
             ))}
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 transition-colors duration-500">
+          <div className="flex flex-wrap gap-2 items-center justify-between text-xs text-slate-500 dark:text-slate-400 transition-colors duration-500">
             <div className="flex items-center">
               <svg className="h-4 w-4 text-slate-400 dark:text-slate-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -162,12 +169,12 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
             )}
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-700 pt-4 transition-colors duration-500">
+        <div className="mt-4 flex flex-wrap gap-2 items-center justify-between border-t border-slate-200 dark:border-slate-700 pt-4 transition-colors duration-500">
           <div className="flex items-center">
             {/* Etiqueta con el color según edad recomendada */}
             <span className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-500 ${
               game.ageRating === 'E' || game.ageRating === 'EC' ? 'bg-green-100 dark:bg-green-600/20 text-green-700 dark:text-green-400'
-              : game.ageRating === 'E10+' ? 'bg-green-200 dark:bg-green-400/20 text-green-800 dark:text-green-600'
+              : game.ageRating === 'E10+' ? 'bg-green-200 dark:bg-green-400/20 text-green-800 dark:text-green-300'
               : game.ageRating === 'T' ? 'bg-yellow-100 dark:bg-yellow-600/20 text-yellow-700 dark:text-yellow-400'
               : game.ageRating === 'M' || game.ageRating === 'AO' ? 'bg-red-100 dark:bg-red-600/20 text-red-700 dark:text-red-400'
               : 'bg-gray-100 dark:bg-gray-600/20 text-gray-700 dark:text-gray-400'
@@ -217,7 +224,7 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
         </div>
 
         {error && (
-          <div role="alert" className="mt-2 text-xs text-red-400 text-center">
+          <div role="alert" className="mt-2 text-xs text-red-700 dark:text-red-300 text-center">
             {error}
           </div>
         )}

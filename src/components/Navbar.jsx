@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useState, useEffect, useRef } from 'react';
 import { useProfile } from '../context/ProfileContext';
-import { MagnifyingGlassIcon, XMarkIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 
 export default function Navbar() {
   const { user, logout, hasRole } = useAuth();
@@ -12,19 +12,15 @@ export default function Navbar() {
   const { selectedProfile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   // Paleta gamer
-  const neon = '#39ff14';
-  const darkBg = 'rgba(10,15,13,0.92)';
-  const lightBg = 'rgba(255,255,255,0.92)';
+  const neon = darkMode ? '#86efac' : '#166534';
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
         setProfileMenuOpen(false);
       }
     };
@@ -46,17 +42,19 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className="shadow-md transition-colors duration-500 w-full z-50 bg-white dark:bg-[#181c1a] border-b-2 border-[#39ff14]22 dark:border-[#39ff14]44"
+        aria-label="Navegación principal"
+        className="shadow-md transition-colors duration-500 w-full z-50 bg-white dark:bg-[#181c1a] border-b border-green-200 dark:border-green-900"
+        onClick={event => { if (event.target.closest('a')) setProfileMenuOpen(false); }}
         style={{
           minHeight: 64,
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-4">
+            <div className="flex min-w-0 items-center gap-2">
               <Link to="/" aria-label="GamerHub — inicio" className="flex-shrink-0 flex items-center">
                 <span
-                  className="font-extrabold text-4xl tracking-widest glitch-navbar neon-glow-navbar"
+                  className="font-extrabold text-xl sm:text-3xl tracking-wide glitch-navbar neon-glow-navbar"
                   aria-hidden="true"
                   style={{ color: neon }}
                 >
@@ -67,12 +65,12 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 sm:gap-4">
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-lg transition-colors duration-300 hover:bg-gray-100 dark:hover:bg-gray-700 neon-glow-navbar"
                 style={{ color: neon }}
-                aria-label="Cambiar tema"
+                aria-label={darkMode ? "Activar tema claro" : "Activar tema oscuro"}
               >
                 {darkMode ? (
                   <SunIcon className="w-5 h-5" />
@@ -84,30 +82,33 @@ export default function Navbar() {
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                    className="flex items-center gap-2 p-2 rounded-lg transition-colors neon-btn-navbar hover:bg-gray-200 dark:hover:bg-gray-800"
+                    aria-expanded={profileMenuOpen}
+                    aria-controls="account-links"
+                    onKeyDown={event => { if (event.key === 'Escape') setProfileMenuOpen(false); }}
+                    className="flex min-w-0 items-center gap-2 p-2 rounded-lg transition-colors neon-btn-navbar hover:bg-gray-200 dark:hover:bg-gray-800"
                     style={{ color: neon }}
                   >
-                    <span>{user.name}</span>
+                    <span className="max-w-16 sm:max-w-40 truncate">{user.name}</span>
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
 
                   {profileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#181c1a] border border-[#39ff14]22 dark:border-[#39ff14]44 rounded-lg shadow-lg py-1 z-50 flex flex-col transition-colors">
+                    <div id="account-links" onKeyDown={event => { if (event.key === 'Escape') { setProfileMenuOpen(false); menuRef.current.querySelector('button').focus(); } }} className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#181c1a] border border-green-200 dark:border-green-900 rounded-lg shadow-lg py-1 z-50 flex flex-col transition-colors">
                       {hasRole('admin') && (
                         <>
                           <Link
                             to="/admin/users"
-                            className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-[#39ff14] neon-btn-navbar transition-colors"
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-green-800 dark:text-green-200 neon-btn-navbar transition-colors"
                           >
-                            Admin Users
+                            Administrar usuarios
                           </Link>
                           <Link
                             to="/admin/games"
-                            className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-[#39ff14] neon-btn-navbar transition-colors"
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-green-800 dark:text-green-200 neon-btn-navbar transition-colors"
                           >
-                            Admin Juegos
+                            Administrar juegos
                           </Link>
                           <button
                             onClick={async () => {
@@ -130,7 +131,7 @@ export default function Navbar() {
                                 alert('No se pudo descargar el reporte: ' + (err.message || 'Error desconocido'));
                               }
                             }}
-                            className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-[#39ff14] neon-btn-navbar transition-colors"
+                            className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-green-800 dark:text-green-200 neon-btn-navbar transition-colors"
                           >
                             Descargar reporte de uso (CSV)
                           </button>
@@ -138,13 +139,13 @@ export default function Navbar() {
                       )}
                       <button
                         onClick={handleProfileChange}
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-[#39ff14] neon-btn-navbar transition-colors"
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-green-800 dark:text-green-200 neon-btn-navbar transition-colors"
                       >
                         Cambiar perfil
                       </button>
                       <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-[#39ff14] neon-btn-navbar transition-colors"
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-[#e0ffe0] dark:hover:bg-[#232323] text-green-800 dark:text-green-200 neon-btn-navbar transition-colors"
                       >
                         Cerrar sesión
                       </button>
@@ -165,7 +166,7 @@ export default function Navbar() {
         !location.pathname.includes('/login') && 
         !location.pathname.includes('/register') && 
         !location.pathname.includes('/admin') && (
-        <div className="w-full bg-slate-800 border-b border-slate-700 py-2">
+        <div className="w-full bg-white dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700 py-2">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-end">
               <Link

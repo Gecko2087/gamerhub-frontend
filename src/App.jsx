@@ -26,10 +26,11 @@ const App = () => {
       <AuthProvider>
         <ProfileProvider>
         <Router>
+          <a href="#main-content" className="skip-link">Saltar al contenido</a>
           <Navbar />
           {DEMO_MODE && <p className="bg-indigo-950 px-4 py-3 text-center text-sm text-indigo-100" role="status">Demo pública · sesión aislada por una hora · usa datos ficticios.</p>}
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss pauseOnHover theme="colored" />
-          <main className="min-h-screen flex-1 w-full flex flex-col p-0 m-0">
+          <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 flex flex-col p-0 m-0">
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />

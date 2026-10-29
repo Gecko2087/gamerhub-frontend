@@ -18,10 +18,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   return (
     <div className="flex justify-center mt-8">
-      <nav className="flex items-center space-x-2">
+      <nav aria-label="Páginas del catálogo" className="flex flex-wrap justify-center items-center gap-1">
         <button
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
+          aria-label="Primera página"
           className="px-3 py-1 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
         >
           «
@@ -30,6 +31,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          aria-label="Página anterior"
           className="px-3 py-1 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
         >
           ‹
@@ -38,6 +40,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         {getVisiblePages().map((page) => (
           <button
             key={page}
+            aria-label={`Página ${page}`}
+            aria-current={currentPage === page ? 'page' : undefined}
             onClick={() => onPageChange(page)}
             className={`px-3 py-1 rounded-md text-sm font-medium ${
               currentPage === page
@@ -52,6 +56,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          aria-label="Página siguiente"
           className="px-3 py-1 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
         >
           ›
@@ -60,6 +65,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
+          aria-label="Última página"
           className="px-3 py-1 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
         >
           »
@@ -69,4 +75,4 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   );
 };
 
-export default Pagination; 
+export default Pagination;

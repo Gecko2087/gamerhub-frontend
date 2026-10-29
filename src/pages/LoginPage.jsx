@@ -36,9 +36,9 @@ const LoginPage = () => {
         </div>
         {!DEMO_MODE && <LoginForm />}
         {DEMO_MODE && (
-          <section className="mt-6 rounded-xl border border-indigo-400/40 bg-indigo-950/40 p-4" aria-labelledby="demo-title">
-            <h2 id="demo-title" className="text-lg font-bold text-white">Recorrido para visitantes</h2>
-            <p id="demo-description" className="mt-2 text-sm text-indigo-100">
+          <section className="mt-6 rounded-xl border border-indigo-400/40 bg-white dark:bg-indigo-950/40 p-6" aria-labelledby="demo-title">
+            <h2 id="demo-title" className="text-lg font-bold text-slate-900 dark:text-white">Recorrido para visitantes</h2>
+            <p id="demo-description" className="mt-2 text-sm text-slate-700 dark:text-indigo-100">
               Abre un espacio temporal y aislado por una hora para probar perfiles, catálogo y favoritos. Usa únicamente datos ficticios.
             </p>
             <button
@@ -52,7 +52,7 @@ const LoginPage = () => {
             </button>
           </section>
         )}
-        {error && <p role="alert" className="mt-3 rounded-lg bg-red-950/40 p-3 text-center text-sm text-red-300">{error}</p>}
+        {error && <p role="alert" className="mt-3 rounded-lg bg-red-100 dark:bg-red-950/40 p-3 text-center text-sm text-red-800 dark:text-red-200">{error}</p>}
       </div>
     </div>
   );

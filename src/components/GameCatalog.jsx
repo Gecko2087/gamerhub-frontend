@@ -282,15 +282,6 @@ const GameCatalog = () => {
     }
   };
 
-  if (loading && !loadingAllGames) {
-    return (
-      <div className="flex flex-col justify-center items-center h-64" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500" aria-hidden="true"></div>
-        <p className="mt-4 text-slate-600 dark:text-slate-300">Cargando catálogo…</p>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div role="alert" className="mx-auto my-12 max-w-xl text-center p-6 text-red-800 bg-red-100 rounded-lg">
@@ -309,14 +300,14 @@ const GameCatalog = () => {
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Catálogo de juegos</h1>
         <p className="mt-2 text-slate-600 dark:text-slate-300">Busca un título y guárdalo en los favoritos del perfil seleccionado.</p>
       </header>
-      <div className="flex flex-wrap gap-4 mb-3 items-end" role="search" aria-label="Buscar y filtrar juegos">
-        <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+      <div className="catalog-filters flex flex-wrap gap-4 mb-3 items-end" role="search" aria-label="Buscar y filtrar juegos">
+        <label className="flex sm:min-w-60 flex-1 flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Buscar por nombre
           <input
             type="search"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="Ejemplo: Zelda"
+            placeholder="Ejemplo: Orbit Runner"
             autoComplete="off"
             aria-describedby="catalog-status"
             className="p-2 rounded border dark:bg-slate-900 dark:text-white"
@@ -352,7 +343,7 @@ const GameCatalog = () => {
         )}
       </div>
       <p id="catalog-status" className="mb-6 text-sm text-slate-600 dark:text-slate-300" role="status" aria-live="polite">
-        {searchInput !== search ? 'Actualizando búsqueda…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
+        {loading || searchInput !== search ? 'Actualizando catálogo…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
       </p>
       {watchlistStatus && <p className="sr-only" role="status" aria-live="polite">{watchlistStatus}</p>}
       
@@ -366,7 +357,7 @@ const GameCatalog = () => {
         </div>
       )}
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div aria-busy={loading || loadingAllGames} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredGames.map((game, index) => (
           <GameCard
             key={`${game._id || game.id || game.rawgId || 'game'}-${index}`}
@@ -374,8 +365,8 @@ const GameCatalog = () => {
             profileId={selectedProfile?._id || profileId}
             allowedRating={selectedProfile?.allowedRating || 'ADULTS'}
             onToggleWatchlist={toggleWatchlist}
-            isInWatchlist={watchlist.some(id => String(id) === String(game._id))}
-            watchlistLoading={!!loadingWatchlist[game._id]}
+            isInWatchlist={watchlist.some(id => String(id) === String(game._id || game.rawgId || game.id))}
+            watchlistLoading={!!loadingWatchlist[game._id || game.rawgId || game.id]}
           />
         ))}
       </div>
@@ -390,7 +381,7 @@ const GameCatalog = () => {
             </p>
           )}
           {(searchInput || genre || platform) && (
-            <button type="button" onClick={() => { setSearchInput(''); setSearch(''); setGenre(''); setPlatform(''); setCurrentPage(1); }} className="mt-4 rounded-md bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-300">
+            <button type="button" onClick={() => { setSearchInput(''); setSearch(''); setGenre(''); setPlatform(''); setCurrentPage(1); }} className="mt-4 rounded-md bg-teal-700 px-4 py-2 font-medium text-white hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-300">
               Limpiar filtros
             </button>
           )}

@@ -18,7 +18,7 @@ const schema = yup.object().shape({
 });
 
 const LoginForm = () => {
-  const { login, error: authError } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -57,11 +57,14 @@ const LoginForm = () => {
           <input
             id="login-email"
             type="email"
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
             {...register('email')}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full border px-3 py-2 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            <p id="email-error" role="alert" className="mt-1 text-sm text-red-700 dark:text-red-300">{errors.email.message}</p>
           )}
         </div>
 
@@ -72,11 +75,14 @@ const LoginForm = () => {
           <input
             id="login-password"
             type="password"
+            autoComplete="current-password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "password-error" : undefined}
             {...register('password')}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full border px-3 py-2 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+            <p id="password-error" role="alert" className="mt-1 text-sm text-red-700 dark:text-red-300">{errors.password.message}</p>
           )}
         </div>
 

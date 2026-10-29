@@ -12,7 +12,7 @@ export default function LandingPage() {
 
   // Paleta gamer
   const neon = '#39ff14';
-  const darkBg = '#0a0f0d';
+  const accentText = darkMode ? '#86efac' : '#166534';
   const cardBg = darkMode ? 'rgba(20,24,22,0.98)' : '#181c1aee';
   const cardBgLight = '#fff';
   const textColor = darkMode ? '#e0ffe0' : '#181c1a';
@@ -25,7 +25,7 @@ export default function LandingPage() {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between relative overflow-hidden transition-colors duration-500" style={{ background: darkMode ? `radial-gradient(ellipse at 50% 30%, #1a1f1d 60%, #0a0f0d 100%)` : `radial-gradient(ellipse at 50% 30%, #e0ffe0 60%, #baffba 100%)` }}>
+    <div className="flex-1 w-full flex flex-col justify-between relative overflow-hidden transition-colors duration-500" style={{ background: darkMode ? `radial-gradient(ellipse at 50% 30%, #1a1f1d 60%, #0a0f0d 100%)` : `radial-gradient(ellipse at 50% 30%, #f0fdf4 60%, #dcfce7 100%)` }}>
       {/* Fondo partículas */}
       <div className="absolute inset-0 z-0 pointer-events-none max-h-screen overflow-hidden">
         <svg width="100%" height="100%" className="w-full h-full max-h-screen">
@@ -52,16 +52,16 @@ export default function LandingPage() {
         </svg>
       </div>
       {/* Tarjeta central */}
-      <main className="flex-1 flex flex-col justify-center items-center w-full p-0 m-0">
-        <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center p-4 md:p-10 rounded-3xl shadow-2xl animate-border-glow transition-colors duration-500"
+      <section aria-label="Bienvenido a GamerHub" className="flex-1 flex flex-col justify-center items-center w-full px-4 py-12 sm:py-20 m-0">
+        <div className="relative z-10 w-full max-w-xl mx-auto flex flex-col items-center p-5 md:p-10 rounded-3xl shadow-2xl transition-colors duration-500"
           style={{
             background: darkMode ? cardBg : cardBgLight,
-            border: `3px solid ${borderColor}`,
-            boxShadow: `0 0 32px ${neon}55, 0 0 8px ${neon}33`,
+            border: `1px solid ${borderColor}66`,
+            boxShadow: darkMode ? `0 0 32px ${neon}18` : '0 20px 60px #16653415',
             color: textColor
           }}>
           {/* Logo glitch */}
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 text-center neon-glow" style={{ color: neon }}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 text-center" style={{ color: accentText }}>
             <span className="sr-only">GamerHub</span>
             <span className="glitch" aria-hidden="true">
               GamerHub
@@ -72,7 +72,7 @@ export default function LandingPage() {
           <p className="text-lg md:text-xl mb-8 z-10 text-center transition-colors duration-500" style={{ color: textColor }}>
             Tu plataforma social de videojuegos
           </p>
-          <div className="flex gap-4 mb-8 z-10">
+          <div className="flex flex-col sm:flex-row w-full sm:w-auto text-center gap-4 mb-8 z-10">
             {!user ? (
               DEMO_MODE ? (
                 <Link
@@ -93,7 +93,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   to="/register"
-                  className="px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#39ff14] focus:ring-offset-2 neon-btn-alt bg-white text-[#39ff14] border-2 border-[#39ff14] hover:bg-[#e0ffe0] dark:bg-[#181c1a] dark:text-[#39ff14] dark:border-[#39ff14] dark:hover:bg-[#232323]"
+                  className="px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#39ff14] focus:ring-offset-2 neon-btn-alt bg-white text-green-800 border-2 border-green-700 hover:bg-[#e0ffe0] dark:bg-[#181c1a] dark:text-[#86efac] dark:border-[#39ff14] dark:hover:bg-[#232323]"
                 >
                   Registrarse
                 </Link>
@@ -110,13 +110,13 @@ export default function LandingPage() {
             <p className="text-base md:text-lg">
               Explora, filtra y guarda tus juegos favoritos.<br />
               Crea perfiles para toda la familia y controla el acceso según la edad.<br />
-              <span className="inline-block mt-4 text-xs opacity-60" style={{ color: neon }}>
+              <span className="inline-block mt-4 text-sm" style={{ color: accentText }}>
                 Inspirado en la pasión gamer <span role="img" aria-label="gamepad">🎮</span>
               </span>
             </p>
           </div>
         </div>
-      </main>
+      </section>
       {/* Animaciones y efectos personalizados */}
       <style>{`
         .glitch {
