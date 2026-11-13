@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 
 const GameCatalog = () => {
   const [games, setGames] = useState([]);
+  const [catalogSource, setCatalogSource] = useState(null);
   const [allGames, setAllGames] = useState([]); // Para filtrado completo en perfiles infantiles
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -137,6 +138,7 @@ const GameCatalog = () => {
         }
       });
       setGames(response.data.games || []);
+      setCatalogSource(response.data.source ?? null);
       setTotalGames(response.data.total || 0);
       setCurrentPage(page);
       
@@ -146,7 +148,7 @@ const GameCatalog = () => {
       }
     } catch (err) {
       setError(err.response
-        ? 'La API no pudo cargar el catálogo. Intenta nuevamente.'
+        ? err.response.data?.error || 'La API no pudo cargar el catálogo. Intenta nuevamente.'
         : 'No se pudo conectar con la API de GamerHub. El catálogo necesita el backend disponible.');
     } finally {
       setLoading(false);
@@ -344,6 +346,7 @@ const GameCatalog = () => {
       </div>
       <p id="catalog-status" className="mb-6 text-sm text-slate-600 dark:text-slate-300" role="status" aria-live="polite">
         {loading || searchInput !== search ? 'Actualizando catálogo…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
+        {catalogSource === 'rawg' && <> Catálogo de <a className="underline" href="https://rawg.io/" target="_blank" rel="noopener noreferrer">RAWG</a>.</>}
       </p>
       {watchlistStatus && <p className="sr-only" role="status" aria-live="polite">{watchlistStatus}</p>}
       
