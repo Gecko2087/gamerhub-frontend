@@ -310,18 +310,6 @@ const GameCatalog = () => {
         </div>
         <p>Encuentra qué jugar y guarda tus favoritos en tu perfil.</p>
       </header>
-      {spotlight && (
-        <section className="catalog-spotlight" aria-labelledby="spotlight-title">
-          <img src={gameCover(spotlight)} onError={coverFallback} alt="" decoding="async" />
-          <div className="spotlight-copy">
-            <p className="catalog-index"><span>▰</span> EN PORTADA</p>
-            <h2 id="spotlight-title">{spotlight.name}</h2>
-            <Link to={`/games/${spotlight._id || spotlight.rawgId || spotlight.id}`}>
-              Ver ficha <span aria-hidden="true">↗</span>
-            </Link>
-          </div>
-        </section>
-      )}
       <div className="catalog-filters flex flex-wrap gap-4 mb-3 items-end" role="search" aria-label="Buscar y filtrar juegos">
         <label className="flex sm:min-w-60 flex-1 flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Buscar por nombre
@@ -364,6 +352,18 @@ const GameCatalog = () => {
           </div>
         )}
       </div>
+      {spotlight && (
+        <section className="catalog-spotlight" aria-labelledby="spotlight-title">
+          <img src={gameCover(spotlight)} onError={coverFallback} alt="" decoding="async" />
+          <div className="spotlight-copy">
+            <p className="catalog-index"><span>▰</span> EN PORTADA</p>
+            <h2 id="spotlight-title">{spotlight.name}</h2>
+            <Link to={`/games/${spotlight._id || spotlight.rawgId || spotlight.id}`}>
+              Ver ficha <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </section>
+      )}
       <p id="catalog-status" className="mb-6 text-sm text-slate-600 dark:text-slate-300" role="status" aria-live="polite">
         {loading || searchInput !== search ? 'Actualizando catálogo…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
         {catalogSource === 'rawg' && <> Catálogo de <a className="underline" href="https://rawg.io/" target="_blank" rel="noopener noreferrer">RAWG</a>.</>}

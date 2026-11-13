@@ -25,7 +25,7 @@ function DemoNotice() {
   const { expiresAt } = useAuth();
   const expiry = expiresAt ? new Date(expiresAt) : null;
   return (
-    <p className="bg-indigo-950 px-4 py-3 text-center text-sm text-indigo-100" role="status">
+    <p className="bg-[#203225] px-4 py-3 text-center text-sm text-[#eef6e6]" role="status">
       Demo pública · usa datos ficticios.
       {expiry && Number.isFinite(expiry.getTime())
         ? <> Tu sesión termina a las <time dateTime={expiresAt}>{expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>.</>

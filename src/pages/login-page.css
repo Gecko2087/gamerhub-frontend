@@ -81,5 +81,5 @@
 
 @media (max-width: 700px) {
   .gh-entry-layout { grid-template-columns: minmax(0, 1fr); }
-  .gh-entry-art { aspect-ratio: 16 / 8; }
+  .gh-entry-art { aspect-ratio: auto; height: clamp(7rem, 34vw, 10rem); }
 }
