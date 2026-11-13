@@ -348,6 +348,7 @@ const GameCatalog = () => {
         {loading || searchInput !== search ? 'Actualizando catálogo…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
         {catalogSource === 'rawg' && <> Catálogo de <a className="underline" href="https://rawg.io/" target="_blank" rel="noopener noreferrer">RAWG</a>.</>}
         {catalogSource === 'igdb' && <> Catálogo de <a className="underline" href="https://www.igdb.com/" target="_blank" rel="noopener noreferrer">IGDB</a>.</>}
+        {catalogSource === 'freetogame' && <> Juegos gratuitos de PC y navegador. Datos de <a className="underline" href="https://www.freetogame.com/" target="_blank" rel="noopener noreferrer">FreeToGame</a>.</>}
       </p>
       {watchlistStatus && <p className="sr-only" role="status" aria-live="polite">{watchlistStatus}</p>}
       
