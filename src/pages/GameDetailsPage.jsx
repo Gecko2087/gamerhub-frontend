@@ -1,3 +1,4 @@
+import { useFavorites } from '../context/FavoritesContext';
 import { API_URL } from '../config/api.js';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -12,7 +13,8 @@ export default function GameDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const { contains, toggle, ready, error: favoritesError, retry: retryFavorites } = useFavorites();
+  const isInWatchlist = contains(id);
   const [saving, setSaving] = useState(false);
   const [retry, setRetry] = useState(0);
   const catalog = `/catalog/${selectedProfile?._id || ''}`;
@@ -20,19 +22,11 @@ export default function GameDetailsPage() {
   useEffect(() => {
     let active = true;
     async function load() {
-      setLoading(true); setError(''); setNotice(''); setGame(null); setIsInWatchlist(false);
+      setLoading(true); setError(''); setNotice(''); setGame(null);
       try {
         const response = await axios.get(`${API_URL}/games/${id}`);
         if (!active) return;
         setGame(response.data);
-        if (selectedProfile?._id) {
-          try {
-            const favorites = await axios.get(`${API_URL}/profiles/${selectedProfile._id}/watchlist`);
-            if (active) setIsInWatchlist(favorites.data.some(item => [item.id, item._id, item.rawgId].some(value => value != null && String(value) === String(id))));
-          } catch {
-            if (active) setNotice('No se pudieron consultar los favoritos. Vuelve a cargar antes de modificarlos.');
-          }
-        }
       } catch {
         if (active) setError('No se pudieron cargar los detalles. Revisa la conexión y vuelve a intentarlo.');
       } finally { if (active) setLoading(false); }
@@ -45,15 +39,12 @@ export default function GameDetailsPage() {
     if (!selectedProfile?._id || saving) return;
     setSaving(true); setNotice('');
     try {
-      if (isInWatchlist) await axios.delete(`${API_URL}/profiles/${selectedProfile._id}/watchlist/${id}`);
-      else await axios.post(`${API_URL}/profiles/${selectedProfile._id}/watchlist`, { gameId: id });
-      setIsInWatchlist(value => !value);
+      await toggle(game, id);
       setNotice(isInWatchlist ? 'Juego quitado de favoritos.' : 'Juego agregado a favoritos.');
     } catch { setNotice('No se pudo actualizar favoritos. Vuelve a intentarlo.'); }
     finally { setSaving(false); }
   }
   const names = values => (values || []).map(value => typeof value === 'string' ? value : value.platform?.name || value.name).filter(Boolean);
-  const unsafeFavorites = notice.startsWith('No se pudieron consultar');
 
   return <section className="w-full max-w-6xl mx-auto px-4 py-8 sm:px-6">
     <Link to={catalog} className="inline-flex mb-6 py-2 font-semibold text-teal-800 dark:text-teal-200 hover:underline">← Volver al catálogo</Link>
@@ -69,9 +60,9 @@ export default function GameDetailsPage() {
             {names(game.platforms).map(name => <span key={name} className="rounded-full bg-slate-200 dark:bg-slate-700 px-3 py-1">{name}</span>)}
             {game.ageRating && <span className="rounded-full bg-indigo-100 dark:bg-indigo-900 px-3 py-1 text-indigo-950 dark:text-indigo-100">Clasificación: {game.ageRating}</span>}
           </div>
-          <button onClick={toggleWatchlist} disabled={saving || unsafeFavorites} aria-pressed={isInWatchlist} className="rounded-lg bg-teal-700 hover:bg-teal-800 px-5 py-3 text-white font-semibold disabled:opacity-60">{saving ? 'Actualizando favoritos…' : isInWatchlist ? 'Quitar de favoritos' : 'Agregar a favoritos'}</button>
+          <button onClick={toggleWatchlist} disabled={saving || !ready} aria-pressed={isInWatchlist} className="rounded-lg bg-teal-700 hover:bg-teal-800 px-5 py-3 text-white font-semibold disabled:opacity-60">{saving ? 'Actualizando favoritos…' : isInWatchlist ? 'Quitar de favoritos' : 'Agregar a favoritos'}</button>
           <p role="status" aria-live="polite" className="mt-3 text-sm">{notice}</p>
-          {unsafeFavorites && <button onClick={() => setRetry(value => value + 1)} className="mt-2 underline font-semibold">Volver a consultar favoritos</button>}
+          {favoritesError && <p role="alert">{favoritesError} <button onClick={retryFavorites} className="underline">Reintentar</button></p>}
           <section className="mt-6 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-5">
             <h2 className="text-xl font-bold">Acerca del juego</h2>
             <p className="mt-3 whitespace-pre-line text-slate-700 dark:text-slate-200">{game.description || game.description_raw || 'Todavía no hay una descripción para este título.'}</p>

@@ -1,3 +1,4 @@
+import { useFavorites } from '../context/FavoritesContext';
 import { API_URL } from '../config/api.js';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -21,7 +22,7 @@ const GameCatalog = () => {
   const { profileId } = useParams();
   const { selectedProfile } = useProfile();
   const prevProfileId = useRef(profileId);
-  const [watchlist, setWatchlist] = useState([]);
+  const { contains, toggle, ready, error: favoritesError, retry } = useFavorites();
   const [loadingWatchlist, setLoadingWatchlist] = useState({});
   const [search, setSearch] = useState('');
   const [genre, setGenre] = useState('');
@@ -41,22 +42,6 @@ const GameCatalog = () => {
       prevProfileId.current = profileId;
     }
   }, [profileId]);
-
-  // Cargar la watchlist del perfil al montar o cambiar de perfil
-  useEffect(() => {
-    const fetchWatchlist = async () => {
-      if (!selectedProfile?._id && !profileId) return;
-      try {
-        const currentProfileId = selectedProfile?._id || profileId;
-        const { data: watchlistData } = await axios.get(`${API_URL}/profiles/${currentProfileId}/watchlist`);
-        setWatchlist(watchlistData.map(g => g._id || g.rawgId || g.id).filter(Boolean));
-      } catch (err) {
-        setWatchlist([]);
-        setWatchlistStatus('No se pudieron cargar los favoritos. El catálogo sigue disponible.');
-      }
-    };
-    fetchWatchlist();
-  }, [selectedProfile?._id, profileId]);
 
   // Verifica si un juego es apropiado según su clasificación ESRB
   const isGameAppropriateForKids = (game) => {
@@ -239,50 +224,17 @@ const GameCatalog = () => {
 
   // Maneja agregar o quitar juegos de la watchlist
   const toggleWatchlist = async (gameId) => {
-    const currentProfileId = selectedProfile?._id || profileId;
     setLoadingWatchlist(prev => ({ ...prev, [gameId]: true }));
+    const game = filteredGames.find(item => (item._id || item.rawgId || item.id) === gameId);
+    const wasSaved = contains(game);
     try {
-      const isInWatchlist = watchlist.some(id => String(id) === String(gameId));
-      if (isInWatchlist) {
-        await axios.delete(`${API_URL}/profiles/${currentProfileId}/watchlist/${gameId}`);
-        setWatchlistStatus('Juego quitado de favoritos.');
-        toast.info('Juego eliminado de la watchlist', {
-          position: "bottom-right",
-          autoClose: 2000,
-          style: { background: '#dc2626', color: '#fff' }
-        });
-      } else {
-        await axios.post(`${API_URL}/profiles/${currentProfileId}/watchlist`, { gameId });
-        setWatchlistStatus('Juego agregado a favoritos.');
-        toast.success('Juego agregado a la watchlist', {
-          position: "bottom-right",
-          autoClose: 2000
-        });
-      }
-      // Actualizar watchlist tras la operación
-      const { data: updatedWatchlistData } = await axios.get(`${API_URL}/profiles/${currentProfileId}/watchlist`);
-      setWatchlist(updatedWatchlistData.map(g => g._id || g.rawgId || g.id).filter(Boolean));
-      setLoadingWatchlist(prev => ({ ...prev, [gameId]: false }));
-      return true;
+      await toggle(game, gameId);
+      setWatchlistStatus(wasSaved ? 'Juego quitado de favoritos.' : 'Juego agregado a favoritos.');
     } catch (err) {
-      let errorMsg = err?.response?.data?.error || err?.response?.data?.message || err.message;
-      if (errorMsg && errorMsg.toLowerCase().includes('ya está en la lista')) {
-        errorMsg = 'El juego ya se encuentra en la watchlist.';
-      }
-      toast.error(`Error: ${errorMsg}`, {
-        position: "bottom-right",
-        autoClose: 3000
-      });
-      setWatchlistStatus(`No se pudo actualizar favoritos: ${errorMsg}`);
-      
-      try {
-        const { data: updatedWatchlistDataOnError } = await axios.get(`${API_URL}/profiles/${currentProfileId}/watchlist`);
-        setWatchlist(updatedWatchlistDataOnError.map(g => g._id || g.rawgId || g.id).filter(Boolean));
-      } catch (e) {
-        setWatchlist([]);
-      }
-      setLoadingWatchlist(prev => ({ ...prev, [gameId]: false }));
+      toast.error('No se pudieron actualizar los favoritos.');
       throw err;
+    } finally {
+      setLoadingWatchlist(prev => ({ ...prev, [gameId]: false }));
     }
   };
 
@@ -370,6 +322,7 @@ const GameCatalog = () => {
         {catalogSource === 'igdb' && <> Catálogo de <a className="underline" href="https://www.igdb.com/" target="_blank" rel="noopener noreferrer">IGDB</a>.</>}
         {catalogSource === 'freetogame' && <> Juegos gratuitos de PC y navegador. Datos de <a className="underline" href="https://www.freetogame.com/" target="_blank" rel="noopener noreferrer">FreeToGame</a>.</>}
       </p>
+      {favoritesError && <p role="alert" className="mb-4">{favoritesError} <button onClick={retry} className="underline">Reintentar</button></p>}
       {watchlistStatus && <p className="sr-only" role="status" aria-live="polite">{watchlistStatus}</p>}
       
       {loadingAllGames && (
@@ -397,7 +350,8 @@ const GameCatalog = () => {
             profileId={selectedProfile?._id || profileId}
             allowedRating={selectedProfile?.allowedRating || 'ADULTS'}
             onToggleWatchlist={toggleWatchlist}
-            isInWatchlist={watchlist.some(id => String(id) === String(game._id || game.rawgId || game.id))}
+            isInWatchlist={contains(game)}
+            watchlistDisabled={!ready}
             watchlistLoading={!!loadingWatchlist[game._id || game.rawgId || game.id]}
           />
         ))}

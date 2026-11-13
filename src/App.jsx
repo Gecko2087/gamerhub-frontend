@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Profiles from './pages/Profiles';
 import Watchlist from './components/Watchlist';
 import { DEMO_MODE } from './config/api';
+import { FavoritesProvider } from './context/FavoritesContext';
 
 const GameCatalog = lazy(() => import('./components/GameCatalog'));
 const GameDetailsPage = lazy(() => import('./pages/GameDetailsPage'));
@@ -40,6 +41,7 @@ const App = () => {
       <AuthProvider>
         <ProfileProvider>
         <Router>
+          <FavoritesProvider>
           <a href="#main-content" className="skip-link">Saltar al contenido</a>
           <Navbar />
           {DEMO_MODE && <DemoNotice />}
@@ -119,6 +121,7 @@ const App = () => {
             </Suspense>
           </main>
           <Footer />
+          </FavoritesProvider>
         </Router>
         </ProfileProvider>
       </AuthProvider>

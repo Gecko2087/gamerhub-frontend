@@ -1,17 +1,23 @@
+import { useFavorites } from '../context/FavoritesContext';
 import { API_URL } from '../config/api.js';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useState, useEffect, useRef } from 'react';
 import { useProfile } from '../context/ProfileContext';
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 
+const sectionLink = ({ isActive }) =>
+  `inline-flex min-h-11 items-center gap-1.5 border-b-2 px-1 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-green-600 ${isActive
+    ? 'border-green-600 text-green-900 dark:border-lime-300 dark:text-lime-200'
+    : 'border-transparent text-slate-700 hover:text-green-800 dark:text-slate-200 dark:hover:text-lime-200'}`;
+
 export default function Navbar() {
   const { user, logout, hasRole } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
   const { selectedProfile } = useProfile();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { games, ready } = useFavorites();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -54,13 +60,11 @@ export default function Navbar() {
             <div className="flex min-w-0 items-center gap-2">
               <Link to="/" aria-label="GamerHub — inicio" className="flex-shrink-0 flex items-center">
                 <span
-                  className="font-extrabold text-xl sm:text-3xl tracking-wide glitch-navbar neon-glow-navbar"
+                  className="font-extrabold text-xl sm:text-3xl tracking-wide "
                   aria-hidden="true"
                   style={{ color: neon }}
                 >
                   GamerHub
-                  <span className="glitch-navbar-copy glitch-navbar-copy-before">GamerHub</span>
-                  <span className="glitch-navbar-copy glitch-navbar-copy-after">GamerHub</span>
                 </span>
               </Link>
             </div>
@@ -68,7 +72,7 @@ export default function Navbar() {
             <div className="flex items-center gap-1 sm:gap-4">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg transition-colors duration-300 hover:bg-gray-100 dark:hover:bg-gray-700 neon-glow-navbar"
+                className="p-2 rounded-lg transition-colors duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 style={{ color: neon }}
                 aria-label={darkMode ? "Activar tema claro" : "Activar tema oscuro"}
               >
@@ -158,81 +162,19 @@ export default function Navbar() {
         </div>
       </nav>
       
-      {/* Barra de Watchlist */}
-      {selectedProfile && 
-        location.pathname.includes('/catalog') &&
-        !location.pathname.includes('/profiles') && 
-        !location.pathname.includes('/watchlist') && 
-        !location.pathname.includes('/login') && 
-        !location.pathname.includes('/register') && 
-        !location.pathname.includes('/admin') && (
-        <div className="w-full bg-white dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700 py-2">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-end">
-              <Link
-                to={`/watchlist/${selectedProfile._id}`}
-                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white py-2 px-4 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-                Ver mi Watchlist
-              </Link>
-            </div>
+      {user && (
+        <nav aria-label="Secciones de GamerHub" className="border-b border-green-200 bg-white dark:border-green-900 dark:bg-[#181c1a]">
+          <div className="mx-auto flex max-w-7xl flex-wrap gap-x-4 px-4 sm:px-6">
+            <NavLink className={sectionLink} to="/profiles">Perfiles</NavLink>
+            {selectedProfile && <>
+              <NavLink className={sectionLink} to={`/catalog/${selectedProfile._id}`}>Catálogo</NavLink>
+              <NavLink className={sectionLink} to={`/watchlist/${selectedProfile._id}`}>
+                Favoritos {ready && <span className="rounded bg-green-200 px-1.5 text-xs tabular-nums text-green-950">{games.length}</span>}
+              </NavLink>
+            </>}
           </div>
-        </div>
+        </nav>
       )}
-      
-      {/* Animaciones y efectos personalizados */}
-      <style>{`
-        .glitch-navbar {
-          position: relative;
-        }
-        .glitch-navbar-copy {
-          position: absolute;
-          left: 0; width: 100%;
-          overflow: hidden;
-          color: #fff;
-          opacity: 0.7;
-          z-index: 1;
-        }
-        .glitch-navbar-copy-before {
-          text-shadow: 2px 0 #00fff7;
-          animation: glitch-anim-navbar 2s infinite linear alternate-reverse;
-          top: 1px;
-        }
-        .glitch-navbar-copy-after {
-          text-shadow: -2px 0 #ff00ea;
-          animation: glitch-anim2-navbar 2.2s infinite linear alternate-reverse;
-          top: -1px;
-        }
-        @keyframes glitch-anim-navbar {
-          0% { clip-path: inset(0 0 80% 0); }
-          20% { clip-path: inset(0 0 60% 0); }
-          40% { clip-path: inset(0 0 40% 0); }
-          60% { clip-path: inset(0 0 20% 0); }
-          80% { clip-path: inset(0 0 60% 0); }
-          100% { clip-path: inset(0 0 80% 0); }
-        }
-        @keyframes glitch-anim2-navbar {
-          0% { clip-path: inset(80% 0 0 0); }
-          20% { clip-path: inset(60% 0 0 0); }
-          40% { clip-path: inset(40% 0 0 0); }
-          60% { clip-path: inset(20% 0 0 0); }
-          80% { clip-path: inset(60% 0 0 0); }
-          100% { clip-path: inset(80% 0 0 0); }
-        }
-        .neon-glow-navbar {
-          filter: drop-shadow(0 0 8px #39ff14) drop-shadow(0 0 16px #39ff14);
-        }
-        .neon-btn-navbar {
-          transition: color 0.2s, background 0.2s;
-        }
-        .neon-btn-navbar:hover {
-          color: #181c1a !important;
-          background: #39ff14 !important;
-        }
-      `}</style>
     </>
   );
 }

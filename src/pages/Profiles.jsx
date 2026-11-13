@@ -11,6 +11,16 @@ import { useProfile } from '../context/ProfileContext';
 import Swal from 'sweetalert2';
 import { DEMO_MODE } from '../config/api';
 
+const profilePortraits = ['orbit-runner', 'forest-signals', 'neon-district', 'deep-horizon', 'pixel-kingdom', 'solar-rally'];
+
+function profilePortrait(profile) {
+  let index = 0;
+  for (const character of String(profile._id)) {
+    index = (index * 31 + character.codePointAt(0)) % profilePortraits.length;
+  }
+  return `/covers/${profilePortraits[index]}.svg`;
+}
+
 const CLASIFICACIONES = {
   KIDS: { label: 'Niños', color: 'bg-green-600' },
   ADULTS: { label: 'Adulto', color: 'bg-red-600' }
@@ -343,9 +353,13 @@ export default function Profiles() {
                 aria-label={`Seleccionar perfil ${profile.name}`}
                 className="flex w-full flex-col items-center rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-4 focus:ring-offset-slate-900"
               >
-                <div className={`w-32 h-32 rounded-full ${profile.allowedRating === 'KIDS' ? 'bg-green-600' : 'bg-red-600'} mx-auto flex items-center justify-center text-4xl font-bold text-white group-hover:ring-4 ring-offset-2 ring-offset-slate-900 ring-teal-400 transition-all duration-200`}>
-                  {profile.name[0].toUpperCase()}
-                </div>
+                <img
+                  src={profilePortrait(profile)}
+                  alt=""
+                  width="128"
+                  height="128"
+                  className="size-32 rounded-2xl border-2 border-transparent object-cover group-hover:border-teal-400"
+                />
                 <span className="mt-3 text-slate-900 dark:text-white font-medium truncate w-full px-1">{profile.name}</span>
                 <span className="flex justify-center items-center gap-2 mt-1 text-xs">
                   <span className={`px-2 py-0.5 rounded-full text-white ${profile.allowedRating === 'KIDS' ? 'bg-green-600' : 'bg-red-600'} font-semibold`}>

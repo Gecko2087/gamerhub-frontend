@@ -69,6 +69,13 @@
 .gh-entry-button:hover { background: #e1ffb5; }
 .gh-entry-button:disabled { cursor: wait; opacity: .75; }
 
+.gh-demo-progress { margin-top: 1rem; }
+.gh-demo-progress progress { display: block; width: min(100%, 19rem); accent-color: #d0f498; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-demo-progress progress { display: none; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .gh-entry-art img { animation: gh-art-reveal 850ms ease-out both; }
   .gh-entry-button span { transition: transform 160ms ease; }

@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('/auth/demo');
+      const response = await axios.post('/auth/demo', undefined, { timeout: 65000 });
       localStorage.removeItem('selectedProfile');
       localStorage.setItem('token', response.data.token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;

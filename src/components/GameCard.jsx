@@ -2,7 +2,7 @@ import { gameCover, coverFallback } from '../utils/gameCover';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatchlist, watchlistLoading }) => {
+const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatchlist, watchlistLoading, watchlistDisabled }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -190,7 +190,7 @@ const GameCard = ({ game, profileId, allowedRating, onToggleWatchlist, isInWatch
           ) : (
             <button
               onClick={handleToggleWatchlist}
-              disabled={isLoading || watchlistLoading}
+              disabled={isLoading || watchlistLoading || watchlistDisabled}
               aria-pressed={isInWatchlist}
               aria-label={`${isInWatchlist ? 'Quitar' : 'Agregar'} ${game.name} ${isInWatchlist ? 'de' : 'a'} favoritos`}
               className="px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 bg-teal-100 dark:bg-teal-600/20 text-teal-700 dark:text-teal-400 hover:bg-teal-200 dark:hover:bg-teal-600/30"

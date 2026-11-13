@@ -1,7 +1,5 @@
-import { API_URL } from '../config/api.js';
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import { useFavorites } from '../context/FavoritesContext';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import GameCard from '../components/GameCard';
 import { toast } from 'react-toastify';
 import { useProfile } from '../context/ProfileContext';
@@ -9,63 +7,21 @@ import { useProfile } from '../context/ProfileContext';
 export default function Watchlist() {
   const { profileId } = useParams();
   const { selectedProfile } = useProfile();
-  const [games, setGames] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { games, ready, error, retry, toggle } = useFavorites();
 
-  const load = useCallback(async () => {
-    if (!profileId) return;
-    
+  if (profileId !== String(selectedProfile?._id)) {
+    return <Navigate to={`/watchlist/${selectedProfile._id}`} replace />;
+  }
+
+  const remove = async game => {
     try {
-      setIsLoading(true);
-      setError('');
-      
-      const { data: watchlistGames } = await axios.get(`${API_URL}/profiles/${profileId}/watchlist`);
-      
-      // Eliminar console.log
-      setGames(watchlistGames || []);
+      await toggle(game);
     } catch (err) {
-      // Eliminar console.error
-      setError('Error al cargar la watchlist');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [profileId]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const remove = async (gameId) => {
-    try {
-      const gameIdToUse = String(gameId);
-      
-      if (!gameIdToUse) {
-        throw new Error('ID de juego inválido para eliminar');
-      }
-
-      setGames(prevGames => prevGames.filter(g => 
-        String(g.id) !== gameIdToUse && 
-        String(g.rawgId) !== gameIdToUse && 
-        String(g._id) !== gameIdToUse
-      ));
-      
-      await axios.delete(`${API_URL}/profiles/${profileId}/watchlist/${gameIdToUse}`);
-      
-      toast.error('Juego eliminado de la watchlist', {
-        className: 'bg-red-100 border-red-400 text-red-700',
-        progressClassName: 'bg-red-500'
-      });
-    } catch (err) {
-      load();
-      const errorMessage = err.response?.data?.error || 'Error al actualizar la watchlist';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      // Eliminar console.error
+      toast.error('No se pudo quitar el juego de favoritos.');
+      throw err;
     }
   };
 
-  // El resto del componente sigue igual
   return (
     <div className="min-h-screen bg-slate-900 p-4">
       <div className="max-w-7xl mx-auto">
@@ -82,23 +38,20 @@ export default function Watchlist() {
         </div>
 
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-white">Mi Watchlist</h1>
-          <span className="text-slate-400">
-            {games.length} {games.length === 1 ? 'juego' : 'juegos'}
+          <h1 className="text-3xl font-bold text-white">Mis favoritos</h1>
+          <span className="text-slate-400" role="status">
+            {ready && `${games.length} ${games.length === 1 ? 'juego' : 'juegos'}`}
           </span>
         </div>
 
-        {isLoading ? (
+        {error ? (
+          <p role="alert" className="text-white">{error} <button onClick={retry} className="underline">Reintentar</button></p>
+        ) : !ready ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+            <p role="status" className="text-white">Cargando favoritos…</p>
           </div>
         ) : (
           <>
-            {error && (
-              <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-lg mb-6">
-                {error}
-              </div>
-            )}
             {games.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {games.map((g) => (
@@ -107,7 +60,7 @@ export default function Watchlist() {
                     game={g}
                     profileId={profileId}
                     allowedRating={selectedProfile?.allowedRating || 'M'} 
-                    onToggleWatchlist={() => remove(g.id || g.rawgId || g._id)} 
+                    onToggleWatchlist={() => remove(g)}
                     isInWatchlist={true} 
                   />
                 ))}
@@ -129,10 +82,10 @@ export default function Watchlist() {
                     />
                   </svg>
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Watchlist vacía
+                    Todavía no tienes favoritos
                   </h3>
                   <p className="text-slate-400 mb-4">
-                    No tienes juegos en tu watchlist. Explora el catálogo para agregar algunos.
+                    Explora el catálogo y guarda los juegos que quieras probar.
                   </p>
                   <Link 
                     to={`/catalog/${profileId}`}
