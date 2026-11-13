@@ -1,6 +1,8 @@
 import { API_URL } from '../config/api.js';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { gameCover, coverFallback } from '../utils/gameCover';
+import './game-catalog.css';
 import axios from 'axios';
 import GameCard from './GameCard';
 import Pagination from './Pagination';
@@ -295,13 +297,32 @@ const GameCatalog = () => {
     );
   }
 
+  const spotlight = !loading && currentPage === 1 && !searchInput && !search && !genre && !platform
+    && selectedProfile?.allowedRating !== 'KIDS'
+    ? filteredGames.find(game => (game._id || game.rawgId || game.id) && gameCover(game) !== '/covers/fallback.svg')
+    : null;
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Filtros y búsqueda */}
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Catálogo de juegos</h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-300">Busca un título y guárdalo en los favoritos del perfil seleccionado.</p>
+    <div className="gamer-catalog container mx-auto px-4 py-8">
+      <header className="catalog-masthead">
+        <div>
+          <p className="catalog-index"><span>01</span> / EXPLORAR</p>
+          <h1>Catálogo de juegos<span>.</span></h1>
+        </div>
+        <p>Encuentra qué jugar y guarda tus favoritos en tu perfil.</p>
       </header>
+      {spotlight && (
+        <section className="catalog-spotlight" aria-labelledby="spotlight-title">
+          <img src={gameCover(spotlight)} onError={coverFallback} alt="" decoding="async" />
+          <div className="spotlight-copy">
+            <p className="catalog-index"><span>▰</span> EN PORTADA</p>
+            <h2 id="spotlight-title">{spotlight.name}</h2>
+            <Link to={`/games/${spotlight._id || spotlight.rawgId || spotlight.id}`}>
+              Ver ficha <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </section>
+      )}
       <div className="catalog-filters flex flex-wrap gap-4 mb-3 items-end" role="search" aria-label="Buscar y filtrar juegos">
         <label className="flex sm:min-w-60 flex-1 flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-200">
           Buscar por nombre
@@ -309,7 +330,7 @@ const GameCatalog = () => {
             type="search"
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="Ejemplo: Orbit Runner"
+            placeholder="Escribe el nombre de un juego"
             autoComplete="off"
             aria-describedby="catalog-status"
             className="p-2 rounded border dark:bg-slate-900 dark:text-white"
@@ -362,7 +383,7 @@ const GameCatalog = () => {
         </div>
       )}
       
-      <div aria-busy={loading || loadingAllGames} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div aria-busy={loading || loadingAllGames} className="catalog-shelf grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {loading && filteredGames.length === 0 && Array.from({ length: 4 }, (_, index) => (
           <div key={index} aria-hidden="true" className="rounded-xl border border-slate-200 p-3 dark:border-slate-700 motion-safe:animate-pulse">
             <div className="aspect-video rounded-lg bg-slate-200 dark:bg-slate-700" />
