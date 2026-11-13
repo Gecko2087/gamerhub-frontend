@@ -306,7 +306,6 @@ const GameCatalog = () => {
     <div className="gamer-catalog container mx-auto px-4 py-8">
       <header className="catalog-masthead">
         <div>
-          <p className="catalog-index"><span>01</span> / EXPLORAR</p>
           <h1>Catálogo de juegos<span>.</span></h1>
         </div>
         <p>Encuentra qué jugar y guarda tus favoritos en tu perfil.</p>

@@ -96,6 +96,11 @@
 
 .spotlight-copy a:hover { background: #d7ffad; }
 .spotlight-copy a:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .spotlight-copy a span { transition: transform 180ms ease; }
+  .spotlight-copy a:is(:hover, :focus-visible) span { transform: translate(3px, -3px); }
+}
 .gamer-catalog .catalog-filters { padding: .9rem 0; border-block: 1px solid var(--catalog-rule); }
 .gamer-catalog .catalog-filters :is(input, select) { min-height: 44px; }
 .catalog-shelf .game-card { border-radius: 0; box-shadow: none; transform: none; }

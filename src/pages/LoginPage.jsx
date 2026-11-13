@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import { DEMO_MODE } from '../config/api';
+import './login-page.css';
 
 const LoginPage = () => {
   const { user, demoLogin, loading, error } = useAuth();
@@ -18,35 +19,32 @@ const LoginPage = () => {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-            GamerHub
-          </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Tu plataforma para descubrir y gestionar tus juegos favoritos
-          </p>
-        </div>
+    <div className="gh-entry">
+      <div className="gh-entry-layout">
+        <figure className="gh-entry-art" aria-hidden="true">
+          <img src="/covers/gamerhub-handheld.webp" alt="" fetchPriority="high" />
+        </figure>
+        <div className="gh-entry-content">
+          <h1>{DEMO_MODE ? '¿Qué jugamos hoy?' : 'Entra a GamerHub'}</h1>
+          {DEMO_MODE && <p>Explora juegos gratuitos de PC y navegador. Guarda los que quieras probar en tu perfil.</p>}
         {!DEMO_MODE && <LoginForm />}
         {DEMO_MODE && (
-          <section className="mt-6 rounded-xl border border-indigo-400/40 bg-white dark:bg-indigo-950/40 p-6" aria-labelledby="demo-title">
-            <h2 id="demo-title" className="text-lg font-bold text-slate-900 dark:text-white">Recorrido para visitantes</h2>
-            <p id="demo-description" className="mt-2 text-sm text-slate-700 dark:text-indigo-100">
-              Abre un espacio temporal y aislado por una hora para probar perfiles, catálogo y favoritos. Usa únicamente datos ficticios.
-            </p>
+          <div className="gh-entry-actions">
             <button
               type="button"
               disabled={loading}
               onClick={handleDemoLogin}
               aria-describedby="demo-description"
-              className="mt-4 w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:cursor-wait disabled:opacity-60"
+              className="gh-entry-button"
             >
               {loading ? 'Preparando sesión demo…' : 'Probar como visitante'}
+              {!loading && <span aria-hidden="true">→</span>}
             </button>
-          </section>
+            <p id="demo-description">Sin registro · Sesión privada de una hora</p>
+          </div>
         )}
         {error && <p role="alert" className="mt-3 rounded-lg bg-red-100 dark:bg-red-950/40 p-3 text-center text-sm text-red-800 dark:text-red-200">{error}</p>}
+        </div>
       </div>
     </div>
   );
