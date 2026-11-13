@@ -14,13 +14,7 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      if (user.role === 'owner' || user.role === 'admin') {
-        navigate('/profiles');
-      } else {
-        navigate('/profiles');
-      }
-    }
+    if (user) navigate('/profiles', { replace: true });
   }, [user, navigate]);
 
   return (

@@ -1,14 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import GameCatalog from './components/GameCatalog';
-import GameDetailsPage from './pages/GameDetailsPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import UserSettingsPage from './pages/UserSettingsPage';
-import AdminUsersPage from './pages/AdminUsersPage';
 import LandingPage from './pages/LandingPage';
 import { ProfileProvider } from './context/ProfileContext';
 import Footer from './components/Footer';
@@ -16,8 +13,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Profiles from './pages/Profiles';
 import Watchlist from './components/Watchlist';
-import AdminGamesPage from './pages/AdminGamesPage';
 import { DEMO_MODE } from './config/api';
+
+const GameCatalog = lazy(() => import('./components/GameCatalog'));
+const GameDetailsPage = lazy(() => import('./pages/GameDetailsPage'));
+const UserSettingsPage = lazy(() => import('./pages/UserSettingsPage'));
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
+const AdminGamesPage = lazy(() => import('./pages/AdminGamesPage'));
 
 function DemoNotice() {
   const { expiresAt } = useAuth();
@@ -43,6 +45,7 @@ const App = () => {
           {DEMO_MODE && <DemoNotice />}
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss pauseOnHover theme="colored" />
           <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 flex flex-col p-0 m-0">
+            <Suspense fallback={<p role="status" className="p-8 text-center">Cargando sección…</p>}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -113,6 +116,7 @@ const App = () => {
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            </Suspense>
           </main>
           <Footer />
         </Router>
