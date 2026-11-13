@@ -306,7 +306,7 @@ const GameCatalog = () => {
       </div>
       {spotlight && (
         <section className="catalog-spotlight" aria-labelledby="spotlight-title">
-          <img src={gameCover(spotlight)} onError={coverFallback} alt="" decoding="async" />
+          <img src={gameCover(spotlight)} onError={coverFallback} alt="" decoding="async" fetchPriority="high" />
           <div className="spotlight-copy">
             <p className="catalog-index"><span>▰</span> EN PORTADA</p>
             <h2 id="spotlight-title">{spotlight.name}</h2>

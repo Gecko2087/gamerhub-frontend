@@ -15,7 +15,7 @@ const profilePortraits = ['orbit-runner', 'forest-signals', 'neon-district', 'de
 
 function profilePortrait(profile) {
   let index = 0;
-  for (const character of String(profile._id)) {
+  for (const character of profile.name.trim().toLowerCase()) {
     index = (index * 31 + character.codePointAt(0)) % profilePortraits.length;
   }
   return `/covers/${profilePortraits[index]}.svg`;
