@@ -347,6 +347,7 @@ const GameCatalog = () => {
       <p id="catalog-status" className="mb-6 text-sm text-slate-600 dark:text-slate-300" role="status" aria-live="polite">
         {loading || searchInput !== search ? 'Actualizando catálogo…' : `${filteredGames.length} ${filteredGames.length === 1 ? 'juego visible' : 'juegos visibles'}.`}
         {catalogSource === 'rawg' && <> Catálogo de <a className="underline" href="https://rawg.io/" target="_blank" rel="noopener noreferrer">RAWG</a>.</>}
+        {catalogSource === 'igdb' && <> Catálogo de <a className="underline" href="https://www.igdb.com/" target="_blank" rel="noopener noreferrer">IGDB</a>.</>}
       </p>
       {watchlistStatus && <p className="sr-only" role="status" aria-live="polite">{watchlistStatus}</p>}
       
