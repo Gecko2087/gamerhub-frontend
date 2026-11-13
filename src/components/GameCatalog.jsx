@@ -358,6 +358,13 @@ const GameCatalog = () => {
       )}
       
       <div aria-busy={loading || loadingAllGames} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {loading && filteredGames.length === 0 && Array.from({ length: 4 }, (_, index) => (
+          <div key={index} aria-hidden="true" className="rounded-xl border border-slate-200 p-3 dark:border-slate-700 motion-safe:animate-pulse">
+            <div className="aspect-video rounded-lg bg-slate-200 dark:bg-slate-700" />
+            <div className="mt-4 h-4 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
+            <div className="mt-3 h-3 w-1/2 rounded bg-slate-200 dark:bg-slate-700" />
+          </div>
+        ))}
         {filteredGames.map((game, index) => (
           <GameCard
             key={`${game._id || game.id || game.rawgId || 'game'}-${index}`}

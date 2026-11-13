@@ -1,5 +1,5 @@
 import { API_URL } from '../config/api.js';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 // Configuración global de Axios
@@ -11,6 +11,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expiresAt, setExpiresAt] = useState(null);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('selectedProfile');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+    setExpiresAt(null);
+    setError(null);
+  }, []);
+
+  useEffect(() => {
+    if (!expiresAt) return;
+    const expires = Date.parse(expiresAt);
+    if (!Number.isFinite(expires)) return;
+    const timer = window.setTimeout(() => {
+      logout();
+      setError('Tu sesión de prueba terminó. Puedes abrir un espacio nuevo.');
+    }, Math.max(0, expires - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [expiresAt, logout]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -26,6 +47,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.get('/auth/me');
       setUser(response.data);
+      setExpiresAt(response.data.expiresAt ?? null);
     } catch (err) {
       console.error('Error fetching user:', err);
       localStorage.removeItem('token');
@@ -89,6 +111,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', response.data.token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       setUser(response.data.user);
+      setExpiresAt(response.data.expiresAt ?? null);
       return true;
     } catch (err) {
       const message = err.response?.data?.error || err.response?.data?.message ||
@@ -100,13 +123,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('selectedProfile');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
   };
 
   const updateUser = (newUserData) => {
@@ -133,6 +149,7 @@ export const AuthProvider = ({ children }) => {
       user,
       loading,
       error,
+      expiresAt,
       login,
       demoLogin,
       register,
